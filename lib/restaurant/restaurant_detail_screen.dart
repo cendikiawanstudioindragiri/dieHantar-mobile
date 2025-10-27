@@ -34,6 +34,13 @@ class RestaurantDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(restaurantName),
         actions: [
+           TextButton.icon(
+            onPressed: () {
+                context.go('/reviews', extra: restaurantName);
+            },
+            icon: const Icon(Icons.reviews, color: Colors.white),
+            label: const Text('Ulasan', style: TextStyle(color: Colors.white)),
+          ),
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
               label: Text(cart.itemCount.toString()),

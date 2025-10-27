@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:myapp/models/user_model.dart';
-import 'package:myapp/order_tracking/rating_dialog.dart';
 import 'package:myapp/services/firebase_service.dart';
 
 const Map<String, String> ORDER_STATUSES = {
@@ -34,13 +34,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     ORDER_STATUSES['DELIVERING']!,
     ORDER_STATUSES['DELIVERED']!,
   ];
-
-  void _showRatingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => RatingDialog(orderId: widget.orderId),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +296,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             const SizedBox(height: 30),
             if (showRatingButton)
               ElevatedButton(
-                onPressed: _showRatingDialog,
+                onPressed: () => context.go('/rating', extra: 'restaurant_id_placeholder'), // Ganti dengan ID restoran yang sebenarnya
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -313,9 +306,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                // Navigasi ke Halaman Utama (Home)
-              },
+              onPressed: () => context.go('/home'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),

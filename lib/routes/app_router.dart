@@ -10,6 +10,9 @@ import 'package:myapp/order_tracking/order_tracking_screen.dart';
 import 'package:myapp/notifications/notification_screen.dart';
 import 'package:myapp/restaurant/restaurant_detail_screen.dart';
 import 'package:myapp/cart/cart_screen.dart';
+import 'package:myapp/checkout/checkout_screen.dart';
+import 'package:myapp/rating/rating_screen.dart';
+import 'package:myapp/rating/reviews_list_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -74,6 +77,26 @@ class AppRouter {
         path: '/cart',
         builder: (BuildContext context, GoRouterState state) {
           return const CartScreen();
+        },
+      ),
+      GoRoute(
+        path: '/checkout',
+        builder: (BuildContext context, GoRouterState state) {
+          return const CheckoutScreen();
+        },
+      ),
+      GoRoute(
+        path: '/rating',
+        builder: (BuildContext context, GoRouterState state) {
+          final restaurantId = state.extra as String? ?? 'default_restaurant_id';
+          return RatingScreen(restaurantId: restaurantId);
+        },
+      ),
+       GoRoute(
+        path: '/reviews',
+        builder: (BuildContext context, GoRouterState state) {
+          final restaurantId = state.extra as String? ?? 'default_restaurant_id';
+          return ReviewsListScreen(restaurantId: restaurantId);
         },
       ),
     ],

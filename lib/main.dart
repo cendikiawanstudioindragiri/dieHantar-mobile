@@ -4,6 +4,7 @@ import 'package:myapp/routes/app_router.dart';
 import 'package:myapp/theme/app_theme.dart';
 import 'package:myapp/features/auth/application/auth_notifier.dart';
 import 'package:myapp/providers/cart_provider.dart';
+import 'package:myapp/providers/review_provider.dart';
 
 void main() {
   runApp(
@@ -11,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthNotifier()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => ReviewProvider()),
       ],
       child: const MyApp(),
     ),
