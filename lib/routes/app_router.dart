@@ -9,6 +9,7 @@ import 'package:myapp/app/settings/settings_screen.dart';
 import 'package:myapp/order_tracking/order_tracking_screen.dart';
 import 'package:myapp/notifications/notification_screen.dart';
 import 'package:myapp/restaurant/restaurant_detail_screen.dart';
+import 'package:myapp/cart/cart_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -67,6 +68,12 @@ class AppRouter {
         builder: (BuildContext context, GoRouterState state) {
           final restaurantName = state.extra as String? ?? 'Nama Restoran';
           return RestaurantDetailScreen(restaurantName: restaurantName);
+        },
+      ),
+      GoRoute(
+        path: '/cart',
+        builder: (BuildContext context, GoRouterState state) {
+          return const CartScreen();
         },
       ),
     ],

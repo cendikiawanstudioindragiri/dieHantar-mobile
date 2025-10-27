@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:myapp/providers/cart_provider.dart';
 
 class RestaurantDetailScreen extends StatelessWidget {
   final String restaurantName;
@@ -7,6 +10,8 @@ class RestaurantDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+
     // Data menu dummy berdasarkan nama restoran
     final Map<String, List<Map<String, dynamic>>> dummyMenus = {
       'Sate Ayam Madura': [
@@ -28,6 +33,20 @@ class RestaurantDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(restaurantName),
+        actions: [
+          Consumer<CartProvider>(
+            builder: (_, cart, ch) => Badge(
+              label: Text(cart.itemCount.toString()),
+              child: ch,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                context.go('/cart');
+              },
+            ),
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: menu.length,
@@ -47,7 +66,20 @@ class RestaurantDetailScreen extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.add_shopping_cart, color: Colors.teal),
                 onPressed: () {
-                  // Tambahkan ke keranjang
+                  cart.addItem(item['name'], item['price']);
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${item['name']} ditambahkan ke keranjang!'),
+                      duration: const Duration(seconds: 2),
+                      action: SnackBarAction(
+                        label: 'UNDO',
+                        onPressed: () {
+                          cart.removeSingleItem(item['name']);
+                        },
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
