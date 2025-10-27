@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "890873103309",
+    "project_id": "cendikiawanstudiosindragiri",
+    "storage_bucket": "cendikiawanstudiosindragiri.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890873103309:android:ad8dfcb1cc2788d9c2ba84",
+        "android_client_info": {
+          "package_name": "com.cendikiawanstudios.dieHantar.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIkBlsQ24fNun7edrRA2fFaKkHrAIN_c4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890873103309:android:05724dfe1345e437c2ba84",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIkBlsQ24fNun7edrRA2fFaKkHrAIN_c4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
