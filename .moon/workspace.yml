@@ -1,0 +1,16 @@
+xprojects:
+  # Ini adalah project utama aplikasi Anda
+  'my-project': 'my-project'
+
+# Ini adalah task level workspace
+tasks:
+  # Task untuk mengelola lingkungan localstack
+  localstack:up:
+    command: 'docker-compose up -d'
+    options:
+      runInCI: false
+
+  localstack:down:
+    command: 'docker-compose down'
+    options:
+      runInCI: false

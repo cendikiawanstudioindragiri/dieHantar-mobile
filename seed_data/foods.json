@@ -1,0 +1,27 @@
+
+[
+    {
+        "id": "f1",
+        "name": "Nasi Goreng Gila",
+        "description": "Nasi goreng dengan bumbu rahasia dan topping melimpah.",
+        "price": 25000,
+        "category": "foods",
+        "imageUrl": "https://example.com/nasi-goreng.jpg"
+    },
+    {
+        "id": "f2",
+        "name": "Mie Ayam Bakso",
+        "description": "Mie kenyal dengan ayam dan bakso sapi asli.",
+        "price": 20000,
+        "category": "foods",
+        "imageUrl": "https://example.com/mie-ayam.jpg"
+    },
+    {
+        "id": "d1",
+        "name": "Es Teh Manis",
+        "description": "Minuman teh segar dengan gula asli.",
+        "price": 5000,
+        "category": "drinks",
+        "imageUrl": "https://example.com/es-teh.jpg"
+    }
+]
