@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/app/auth/auth_repository.dart';
 import 'package:myapp/app/settings/settings_screen.dart';
-import 'package:myapp/services/firebase_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -54,4 +53,7 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class FirebaseService {
 }

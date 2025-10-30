@@ -1,4 +1,4 @@
-const Map<String, String> ORDER_STATUSES = {
+const Map<String, String> orderStatuses = {
   'PENDING': 'PENDING',
   'ACCEPTED': 'ACCEPTED',
   'SEARCHING_DRIVER': 'SEARCHING_DRIVER',

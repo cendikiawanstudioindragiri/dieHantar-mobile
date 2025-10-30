@@ -308,7 +308,7 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
                       _tipAmount = selected ? amount : 0;
                     });
                   },
-                )).toList(),
+                )),
                 ActionChip(
                   label: Text(_tipAmount != 0 && !_tipOptions.contains(_tipAmount) ? 'Rp $_tipAmount (Custom)' : 'Custom'),
                   onPressed: () => print('Buka dialog input tip kustom'),

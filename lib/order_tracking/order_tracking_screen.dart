@@ -1,9 +1,10 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:myapp/models/user_model.dart';
+import 'package:myapp/models/order_model.dart';
 import 'package:myapp/services/firebase_service.dart';
 
-const Map<String, String> ORDER_STATUSES = {
+const Map<String, String> orderStatuses = {
   'PENDING_PAYMENT': 'Menunggu Pembayaran',
   'PROCESSING': 'Pesanan Diproses oleh Toko',
   'DRIVER_SEARCHING': 'Mencari Driver',
@@ -25,14 +26,14 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  final FirebaseService _firebaseService = FirebaseService();
+  final OrderService _orderService = OrderService();
 
   final List<String> trackingSteps = [
-    ORDER_STATUSES['PROCESSING']!,
-    ORDER_STATUSES['DRIVER_SEARCHING']!,
-    ORDER_STATUSES['PICKED_UP']!,
-    ORDER_STATUSES['DELIVERING']!,
-    ORDER_STATUSES['DELIVERED']!,
+    orderStatuses['PROCESSING']!,
+    orderStatuses['DRIVER_SEARCHING']!,
+    orderStatuses['PICKED_UP']!,
+    orderStatuses['DELIVERING']!,
+    orderStatuses['DELIVERED']!,
   ];
 
   @override
@@ -44,7 +45,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         elevation: 0,
       ),
       body: StreamBuilder<OrderModel>(
-        stream: _firebaseService.streamOrderDetails(widget.orderId),
+        stream: _orderService.streamOrderDetails(widget.orderId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -59,7 +60,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           final order = snapshot.data!;
           final currentStatus = order.status;
 
-          if (currentStatus == ORDER_STATUSES['CANCELED']) {
+          if (currentStatus == orderStatuses['CANCELED']) {
             return _buildCanceledOrDeliveredView(
                 'Pesanan Dibatalkan',
                 Colors.red,
@@ -67,7 +68,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 Icons.cancel_outlined);
           }
 
-          if (currentStatus == ORDER_STATUSES['DELIVERED']) {
+          if (currentStatus == orderStatuses['DELIVERED']) {
             return _buildCanceledOrDeliveredView(
                 'Pesanan Selesai',
                 Colors.green,
@@ -322,6 +323,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   void contactDriver(String type, String orderId) {
     // Panggil Cloud Function
-    print('Memanggil Cloud Function untuk $type Driver di Order $orderId');
+    developer.log('Memanggil Cloud Function untuk $type Driver di Order $orderId');
   }
 }

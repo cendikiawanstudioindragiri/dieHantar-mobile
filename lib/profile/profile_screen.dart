@@ -161,7 +161,7 @@ class WalletScreen extends StatelessWidget {
                     color: tx['type'] == 'debit' ? Colors.redAccent : Colors.green,
                   ),
                 ),
-              )).toList(),
+              )),
               if (history.isEmpty) const Text("Belum ada riwayat transaksi."),
             ],
           ),

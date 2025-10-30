@@ -424,7 +424,7 @@ class _SearchScreenState extends State<SearchScreen> {
               _searchController.text = term;
               setState(() => _query = term.toLowerCase());
             },
-          )).toList(),
+          )),
           const Divider(),
           // Kategori Layanan Cepat
           _buildCategoryChips(),
@@ -495,7 +495,7 @@ class _SearchScreenState extends State<SearchScreen> {
           leading: Icon(icon, color: Colors.teal),
           title: Text(result),
           onTap: () => print('Membuka detail untuk: $result'),
-        )).toList(),
+        )),
         const Divider(),
       ],
     );
