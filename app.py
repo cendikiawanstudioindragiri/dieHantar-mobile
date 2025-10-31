@@ -4,13 +4,14 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 
-# Impor dan daftarkan blueprint
+# Blueprint imports
 from blueprints.data_catalog import data_catalog_bp
 from blueprints.order import order_bp
-from blueprints.driver import driver_bp
+from blueprints.drivers import drivers_bp
 
-# Muat variabel lingkungan dari .env
+# Load environment variables from .env
 load_dotenv()
+
 
 def create_app():
     """
@@ -21,16 +22,15 @@ def create_app():
     """
     app = Flask(__name__)
 
-    # Konfigurasi aplikasi (jika ada)
+    # Application configuration
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "super-secret-key-default")
-    # Tambahkan konfigurasi lain di sini jika diperlukan
+    # Add other configurations here if needed
 
-    # Daftarkan blueprint
+    # Register blueprints
     app.register_blueprint(data_catalog_bp, url_prefix='/api/v1/catalog')
     app.register_blueprint(order_bp, url_prefix='/api/v1/orders')
-    app.register_blueprint(driver_bp, url_prefix='/api/v1/drivers')
+    app.register_blueprint(drivers_bp, url_prefix='/api/v1/drivers')
 
-    @app.route("/")
     @app.route("/")
     def index():
         """
@@ -39,6 +39,7 @@ def create_app():
         return "Selamat datang di dieHantar API!"
 
     return app
+
 
 if __name__ == "__main__":
     # Create the app instance and run it directly

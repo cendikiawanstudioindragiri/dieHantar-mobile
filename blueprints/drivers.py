@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from . import driver_service as service
 
 # Definisikan Blueprint untuk driver
-drivers_bp = Blueprint('drivers_bp', __name__, url_prefix='/api/v1/drivers')
+drivers_bp = Blueprint('drivers_bp', __name__)
 
 # --- Rute untuk Informasi dan Aksi Driver --- #
 
