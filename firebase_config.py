@@ -1,4 +1,5 @@
 import firebase_admin
+import os
 from firebase_admin import credentials, firestore, auth, messaging
 
 def initialize_firebase_admin():
@@ -8,19 +9,26 @@ def initialize_firebase_admin():
     """
     # Cek apakah aplikasi default sudah ada sebelum mencoba inisialisasi
     if not firebase_admin._apps:
+        firebase_credentials_json = os.environ.get('FIREBASE_CREDENTIALS_JSON')
         try:
-            cred = credentials.Certificate("firebase-service-account.json")
-            firebase_admin.initialize_app(cred)
-            print("INFO: Firebase Admin SDK berhasil diinisialisasi.")
-        except FileNotFoundError:
-            print("WARNING: File 'firebase-service-account.json' tidak ditemukan. Mencoba inisialisasi default (untuk lingkungan Google Cloud).")
-            try:
-                firebase_admin.initialize_app()
-                print("INFO: Berhasil inisialisasi Firebase Admin secara default.")
-            except ValueError:
+            if firebase_credentials_json:
+                import json
+                cred = credentials.Certificate(json.loads(firebase_credentials_json))
+                firebase_admin.initialize_app(cred)
+                print("INFO: Firebase Admin SDK berhasil diinisialisasi dari variabel lingkungan FIREBASE_CREDENTIALS_JSON.")
+            else:
+                print("WARNING: Variabel lingkungan FIREBASE_CREDENTIALS_JSON tidak ditemukan. Mencoba inisialisasi default (untuk lingkungan Google Cloud).")
+                try:
+                    firebase_admin.initialize_app()
+                    print("INFO: Berhasil inisialisasi Firebase Admin secara default.")
+                except ValueError:
+                    print("FATAL: Gagal total menginisialisasi Firebase Admin. Kredensial tidak ditemukan.")
+                    # Hentikan aplikasi jika tidak ada kredensial sama sekali
+                    raise
+        except Exception as e:
                 print("FATAL: Gagal total menginisialisasi Firebase Admin. Kredensial tidak ditemukan.")
+                print(f"Error: {e}")
                 # Hentikan aplikasi jika tidak ada kredensial sama sekali
-                raise
     # Jika sudah ada, tidak perlu melakukan apa-apa.
 
 def get_firestore_client():
