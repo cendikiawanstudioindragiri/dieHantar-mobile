@@ -24,10 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Beranda'),
         actions: [
           Consumer<CartProvider>(
-            builder: (_, cart, ch) => Badge(
-              label: Text(cart.itemCount.toString()),
-              child: ch,
-            ),
+            builder: (_, cart, ch) =>
+                Badge(label: Text(cart.itemCount.toString()), child: ch),
             child: IconButton(
               icon: const Icon(Icons.shopping_cart),
               onPressed: () {
@@ -162,7 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           final restaurant = restaurants[index];
           return GestureDetector(
-            onTap: () => _navigateToRestaurantDetail(restaurant['name'] as String),
+            onTap: () =>
+                _navigateToRestaurantDetail(restaurant['name'] as String),
             child: _buildRestaurantCard(
               restaurant['name'] as String,
               restaurant['image'] as String,
@@ -195,13 +194,22 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 5),
                   Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 18),
                       const SizedBox(width: 4),
-                      Text(rating.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        rating.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ],

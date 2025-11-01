@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/auth/auth_repository.dart';
@@ -6,11 +5,11 @@ import 'package:myapp/features/auth/presentation/login_screen.dart';
 import 'package:myapp/features/auth/presentation/signup_screen.dart';
 import 'package:myapp/features/auth/presentation/welcome_screen.dart';
 import 'package:myapp/features/home/presentation/home_screen.dart';
-import 'package:myapp/features/home/presentation/home_result_screen.dart';
 import 'package:myapp/services/firebase_service.dart';
 import 'package:myapp/splash/splash_screen.dart';
 import 'package:myapp/theme/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:myapp/auth/auth_service.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -32,7 +31,10 @@ class _MyAppState extends State<MyApp> {
       refreshListenable: _authService,
       redirect: (BuildContext context, GoRouterState state) {
         final bool loggedIn = _authService.currentUser != null;
-        final bool loggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/signup' || state.matchedLocation == '/welcome';
+        final bool loggingIn =
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/signup' ||
+            state.matchedLocation == '/welcome';
 
         if (!loggedIn) {
           return loggingIn ? null : '/welcome';
@@ -75,13 +77,6 @@ class _MyAppState extends State<MyApp> {
             return const HomeScreen();
           },
         ),
-        GoRoute(
-          path: '/order-result/:orderId',
-          builder: (BuildContext context, GoRouterState state) {
-            final orderId = state.pathParameters['orderId']!;
-            return HomeResultScreen(orderId: orderId);
-          },
-        ),
       ],
     );
   }
@@ -97,6 +92,7 @@ class _MyAppState extends State<MyApp> {
           update: (context, authService, _) => AuthRepository(authService),
         ),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthService()), // Added this line
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

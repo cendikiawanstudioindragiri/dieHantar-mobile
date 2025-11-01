@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:myapp/app/auth/auth_repository.dart';
 import 'package:myapp/app/auth/login_screen.dart';
@@ -34,7 +33,9 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               ElevatedButton.icon(
-                icon: const Icon(Icons.g_mobiledata), // Placeholder for Google Icon
+                icon: const Icon(
+                  Icons.g_mobiledata,
+                ), // Placeholder for Google Icon
                 label: const Text('Masuk dengan Google'),
                 onPressed: () async {
                   final user = await authRepository.signInWithGoogle();
@@ -45,7 +46,9 @@ class WelcomeScreen extends StatelessWidget {
                     // Handle sign-in failure
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Gagal masuk dengan Google.')),
+                      const SnackBar(
+                        content: Text('Gagal masuk dengan Google.'),
+                      ),
                     );
                   }
                 },

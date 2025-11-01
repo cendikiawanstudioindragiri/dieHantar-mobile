@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myapp/providers/review_provider.dart';
 import 'package:myapp/models/review_model.dart';
 import 'package:go_router/go_router.dart';
@@ -17,33 +18,45 @@ class _RatingScreenState extends State<RatingScreen> {
   double _rating = 0;
   final _commentController = TextEditingController();
 
-  void _submitReview() {
+  Future<void> _submitReview() async {
     if (_rating > 0 && _commentController.text.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
       final newReview = Review(
-        id: DateTime.now().toString(),
+        id: ' ', // The backend will generate the ID
         restaurantId: widget.restaurantId,
-        userName: 'Pengguna Anonim', // Ganti dengan nama pengguna yang sebenarnya jika ada
+        userName: user.displayName ?? 'Anonymous User',
         rating: _rating,
         comment: _commentController.text,
-        timestamp: DateTime.now(),
+        timestamp: DateTime.now(), // The backend will handle the timestamp
       );
-      Provider.of<ReviewProvider>(context, listen: false).addReview(newReview);
-      context.pop(); // Kembali ke halaman sebelumnya setelah submit
+
+      await Provider.of<ReviewProvider>(
+        context,
+        listen: false,
+      ).submitReview(newReview);
+
+      if (mounted) {
+        context.pop(); // Go back to the previous page after submitting
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Beri Ulasan'),
-      ),
+      appBar: AppBar(title: const Text('Beri Ulasan')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Beri rating untuk restoran ini', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+            const Text(
+              'Beri rating untuk restoran ini',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18),
+            ),
             const SizedBox(height: 10),
             _buildStarRating(),
             const SizedBox(height: 20),

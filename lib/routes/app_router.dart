@@ -88,14 +88,16 @@ class AppRouter {
       GoRoute(
         path: '/rating',
         builder: (BuildContext context, GoRouterState state) {
-          final restaurantId = state.extra as String? ?? 'default_restaurant_id';
+          final restaurantId =
+              state.extra as String? ?? 'default_restaurant_id';
           return RatingScreen(restaurantId: restaurantId);
         },
       ),
-       GoRoute(
+      GoRoute(
         path: '/reviews',
         builder: (BuildContext context, GoRouterState state) {
-          final restaurantId = state.extra as String? ?? 'default_restaurant_id';
+          final restaurantId =
+              state.extra as String? ?? 'default_restaurant_id';
           return ReviewsListScreen(restaurantId: restaurantId);
         },
       ),

@@ -62,19 +62,21 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
           if (currentStatus == orderStatuses['CANCELED']) {
             return _buildCanceledOrDeliveredView(
-                'Pesanan Dibatalkan',
-                Colors.red,
-                'Mohon maaf, pesanan ini telah dibatalkan.',
-                Icons.cancel_outlined);
+              'Pesanan Dibatalkan',
+              Colors.red,
+              'Mohon maaf, pesanan ini telah dibatalkan.',
+              Icons.cancel_outlined,
+            );
           }
 
           if (currentStatus == orderStatuses['DELIVERED']) {
             return _buildCanceledOrDeliveredView(
-                'Pesanan Selesai',
-                Colors.green,
-                'Terima kasih telah menggunakan dieHantar! Jangan lupa berikan Rating.',
-                Icons.check_circle_outline,
-                showRatingButton: true);
+              'Pesanan Selesai',
+              Colors.green,
+              'Terima kasih telah menggunakan dieHantar! Jangan lupa berikan Rating.',
+              Icons.check_circle_outline,
+              showRatingButton: true,
+            );
           }
 
           return SingleChildScrollView(
@@ -110,7 +112,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('No. Pesanan: $orderId', style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            Text(
+              'No. Pesanan: $orderId',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -159,9 +164,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   decoration: BoxDecoration(
                     color: isCompleted ? Colors.teal : Colors.grey[300],
                     shape: BoxShape.circle,
-                    border: isCurrent ? Border.all(color: Colors.teal, width: 3) : null,
+                    border: isCurrent
+                        ? Border.all(color: Colors.teal, width: 3)
+                        : null,
                   ),
-                  child: isCompleted ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
+                  child: isCompleted
+                      ? const Icon(Icons.check, color: Colors.white, size: 14)
+                      : null,
                 ),
                 if (index < trackingSteps.length - 1)
                   Container(
@@ -200,7 +209,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Driver Anda', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+            const Text(
+              'Driver Anda',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.teal,
+              ),
+            ),
             const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,8 +231,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(driverName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text(licensePlate, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text(
+                          driverName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          licensePlate,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -249,7 +274,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         leading: const Icon(Icons.location_on, color: Colors.red),
-        title: const Text('Alamat Pengiriman', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Alamat Pengiriman',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Text(address),
       ),
     );
@@ -264,10 +292,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Total Pembayaran:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text(
+              'Total Pembayaran:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             Text(
               'Rp ${order.totalAmount.toString()}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
             ),
           ],
         ),
@@ -275,7 +310,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildCanceledOrDeliveredView(String title, Color color, String message, IconData icon, {bool showRatingButton = false}) {
+  Widget _buildCanceledOrDeliveredView(
+    String title,
+    Color color,
+    String message,
+    IconData icon, {
+    bool showRatingButton = false,
+  }) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -286,7 +327,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             const SizedBox(height: 20),
             Text(
               title,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
@@ -297,23 +342,42 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             const SizedBox(height: 30),
             if (showRatingButton)
               ElevatedButton(
-                onPressed: () => context.go('/rating', extra: 'restaurant_id_placeholder'), // Ganti dengan ID restoran yang sebenarnya
+                onPressed: () => context.go(
+                  '/rating',
+                  extra: 'restaurant_id_placeholder',
+                ), // Ganti dengan ID restoran yang sebenarnya
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-                child: const Text('Beri Ulasan', style: TextStyle(fontSize: 16, color: Colors.white)),
+                child: const Text(
+                  'Beri Ulasan',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () => context.go('/home'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: const Text('Kembali ke Home', style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: const Text(
+                'Kembali ke Home',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -323,6 +387,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   void contactDriver(String type, String orderId) {
     // Panggil Cloud Function
-    developer.log('Memanggil Cloud Function untuk $type Driver di Order $orderId');
+    developer.log(
+      'Memanggil Cloud Function untuk $type Driver di Order $orderId',
+    );
   }
 }

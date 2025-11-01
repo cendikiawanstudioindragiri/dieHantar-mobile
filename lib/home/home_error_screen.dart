@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class HomeErrorScreen extends StatelessWidget {
@@ -6,10 +5,6 @@ class HomeErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Home Error Screen'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Home Error Screen')));
   }
 }

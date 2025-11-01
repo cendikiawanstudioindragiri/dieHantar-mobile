@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myapp/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LocationModel {
   final String id;
@@ -18,6 +19,29 @@ class LocationModel {
     required this.lon,
     this.isFavorite = false,
   });
+
+  // Add fromFirestore and toMap methods
+  factory LocationModel.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>; // Cast to be safe
+    return LocationModel(
+      id: doc.id,
+      name: data['name'] ?? '',
+      address: data['address'] ?? '',
+      lat: (data['lat'] ?? 0.0).toDouble(), // Ensure double
+      lon: (data['lon'] ?? 0.0).toDouble(), // Ensure double
+      isFavorite: data['isFavorite'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'address': address,
+      'lat': lat,
+      'lon': lon,
+      'isFavorite': isFavorite,
+    };
+  }
 }
 
 class ProductModel {
@@ -36,7 +60,6 @@ class ProductModel {
 /// 1. I. SELECT LOCATION (My location, My Location_Add New Location)
 /// =======================================================================
 class LocationSelectionScreen extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'dummy_uid';
   final DataService _dataService = DataService();
 
   LocationSelectionScreen({super.key});
@@ -48,43 +71,58 @@ class LocationSelectionScreen extends StatelessWidget {
         title: const Text('Pilih Lokasi Pengiriman'),
         backgroundColor: Colors.teal,
       ),
-      body: StreamBuilder<List<LocationModel>>(
-        stream: _dataService.userLocationsStream(userId),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _dataService.userLocationsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.docs.isEmpty) {
             return const Center(child: Text("Belum ada lokasi tersimpan."));
           }
 
-          final locations = snapshot.data!;
-          final favoriteLocations = locations.where((l) => l.isFavorite).toList();
+          final locations = snapshot.data!.docs
+              .map((doc) => LocationModel.fromFirestore(doc))
+              .toList();
+          final favoriteLocations = locations
+              .where((l) => l.isFavorite)
+              .toList();
           final otherLocations = locations.where((l) => !l.isFavorite).toList();
 
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildCurrentLocation(), // I. My location
-                
-                // I. my locations_Favorite
+                _buildCurrentLocation(),
                 if (favoriteLocations.isNotEmpty)
-                  _buildLocationList('Lokasi Favorit (I. my locations_Favorite)', favoriteLocations, Icons.favorite),
-
-                // I. my locations
-                _buildLocationList('Lokasi Lainnya (I. my locations)', otherLocations, Icons.place),
-
+                  _buildLocationList(
+                    'Lokasi Favorit',
+                    favoriteLocations,
+                    Icons.favorite,
+                    context,
+                  ),
+                _buildLocationList(
+                  'Lokasi Lainnya',
+                  otherLocations,
+                  Icons.place,
+                  context,
+                ),
                 const Divider(),
-                // I. My Location_Add New Location
                 ListTile(
-                  leading: const Icon(Icons.add_location_alt, color: Colors.teal),
-                  title: const Text('Tambah Lokasi Baru', style: TextStyle(fontWeight: FontWeight.bold)),
+                  leading: const Icon(
+                    Icons.add_location_alt,
+                    color: Colors.teal,
+                  ),
+                  title: const Text(
+                    'Tambah Lokasi Baru',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   onTap: () {
-                    // Tampilkan modal atau navigasi ke form tambah lokasi
                     _showAddLocationForm(context);
                   },
-                )
+                ),
               ],
             ),
           );
@@ -94,10 +132,9 @@ class LocationSelectionScreen extends StatelessWidget {
   }
 
   Widget _buildCurrentLocation() {
-    // I. My location
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.teal.withOpacity(0.1),
+      color: Colors.teal.withAlpha(25), // Replaced withOpacity
       child: const Row(
         children: [
           Icon(Icons.gps_fixed, color: Colors.teal),
@@ -106,8 +143,14 @@ class LocationSelectionScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Lokasi Saya Saat Ini', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Gunakan GPS Anda', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  'Lokasi Saya Saat Ini',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Gunakan GPS Anda',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -117,27 +160,48 @@ class LocationSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationList(String title, List<LocationModel> locations, IconData icon) {
+  Widget _buildLocationList(
+    String title,
+    List<LocationModel> locations,
+    IconData icon,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
-        ...locations.map((loc) => ListTile(
-          leading: Icon(icon, color: Colors.blueGrey),
-          title: Text(loc.name),
-          subtitle: Text(loc.address, maxLines: 1, overflow: TextOverflow.ellipsis),
-          trailing: loc.isFavorite ? const Icon(Icons.star, color: Colors.amber) : null,
-          onTap: () => print('Lokasi dipilih: ${loc.name}'),
-        )),
+        ...locations.map(
+          (loc) => ListTile(
+            leading: Icon(icon, color: Colors.blueGrey),
+            title: Text(loc.name),
+            subtitle: Text(
+              loc.address,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: loc.isFavorite
+                ? const Icon(Icons.star, color: Colors.amber)
+                : null,
+            onTap: () {
+              // Handle location selection
+              Navigator.pop(context, loc); // Example action
+            },
+          ),
+        ),
       ],
     );
   }
-  
+
   void _showAddLocationForm(BuildContext context) {
-    // Simulasi form untuk I. My Location_Add New Location
+    final nameController = TextEditingController();
+    final addressController = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -145,28 +209,50 @@ class LocationSelectionScreen extends StatelessWidget {
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16, right: 16, top: 16
+            left: 16,
+            right: 16,
+            top: 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Tambah Alamat Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                'Tambah Alamat Baru',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 15),
-              TextField(decoration: InputDecoration(labelText: 'Nama Lokasi (cth: Rumah, Kantor)')),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Nama Lokasi (cth: Rumah, Kantor)',
+                ),
+              ),
               const SizedBox(height: 10),
-              TextField(decoration: InputDecoration(labelText: 'Alamat Lengkap')),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(labelText: 'Alamat Lengkap'),
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // Simulasi penambahan lokasi (I. My Location_Added New Location)
-                  _dataService.addUserLocation(userId, const LocationModel(id: '', name: '', address: '', lat: 0, lon: 0));
+                  final newLocation = LocationModel(
+                    id: '', // Firestore will generate this
+                    name: nameController.text,
+                    address: addressController.text,
+                    lat: 0, // Placeholder, ideally get from a map picker
+                    lon: 0, // Placeholder
+                  );
+                  _dataService.addUserLocation(newLocation.toMap());
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text('Simpan Alamat', style: TextStyle(color: Colors.white)),
+                child: const Text(
+                  'Simpan Alamat',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               const SizedBox(height: 10),
             ],
@@ -176,6 +262,8 @@ class LocationSelectionScreen extends StatelessWidget {
     );
   }
 }
+
+// ... (rest of the file remains the same for now)
 
 
 /// =======================================================================
@@ -201,41 +289,60 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             expandedHeight: 250,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(widget.product.name, style: const TextStyle(shadows: [Shadow(blurRadius: 5)])),
-              background: Container(color: Colors.grey[200]), // L. Foods_Detail (Gambar Produk)
+              title: Text(
+                widget.product.name,
+                style: const TextStyle(shadows: [Shadow(blurRadius: 5)]),
+              ),
+              background: Container(
+                color: Colors.grey[200],
+              ), // L. Foods_Detail (Gambar Produk)
             ),
             actions: [
               // L. Foods_Detail_Share freinds
-              IconButton(icon: const Icon(Icons.share), onPressed: () => print('Share produk')), 
+              IconButton(
+                icon: const Icon(Icons.share),
+                onPressed: () { /* Handle share */ },
+              ),
             ],
           ),
           SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Rp ${widget.product.price}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent)),
-                      const SizedBox(height: 10),
+            delegate: SliverChildListDelegate([
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rp ${widget.product.price}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
 
-                      // Deskripsi (L. Foods_Detail_See more)
-                      const Text("product description"),
-                      TextButton(onPressed: () => print('Lihat deskripsi lebih lanjut'), child: const Text('Lihat Selengkapnya', style: TextStyle(color: Colors.teal))), 
-                      const Divider(),
+                    // Deskripsi (L. Foods_Detail_See more)
+                    const Text("product description"),
+                    TextButton(
+                      onPressed: () { /* Handle see more */ },
+                      child: const Text(
+                        'Lihat Selengkapnya',
+                        style: TextStyle(color: Colors.teal),
+                      ),
+                    ),
+                    const Divider(),
 
-                      // Ulasan & Rating (L. Foods_Detail_See All Review)
-                      _buildReviewSummary(context),
-                      const Divider(),
-                      
-                      // Opsi Pilihan (L. Foods_Detail_select 2)
-                      _buildProductOptions(), 
-                    ],
-                  ),
+                    // Ulasan & Rating (L. Foods_Detail_See All Review)
+                    _buildReviewSummary(context),
+                    const Divider(),
+
+                    // Opsi Pilihan (L. Foods_Detail_select 2)
+                    _buildProductOptions(),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ]),
           ),
         ],
       ),
@@ -255,19 +362,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 const Icon(Icons.star, color: Colors.amber, size: 20),
                 const SizedBox(width: 5),
-                Text('4.5 (120 ulasan)', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  '4.5 (120 ulasan)',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
             TextButton(
-              onPressed: () => print('Navigasi ke Semua Ulasan'), 
-              child: const Text('Lihat Semua Ulasan', style: TextStyle(color: Colors.teal)),
+              onPressed: () { /* Navigate to all reviews */ },
+              child: const Text(
+                'Lihat Semua Ulasan',
+                style: TextStyle(color: Colors.teal),
+              ),
             ),
           ],
         ),
         // Simulasi 1 ulasan terbaru
         const SizedBox(height: 8),
-        const Text('“Rasanya enak, pengiriman cepat!”', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
-        const Text('- Oleh User A', style: TextStyle(fontSize: 12, color: Colors.grey)),
+        const Text(
+          '“Rasanya enak, pengiriman cepat!”',
+          style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+        ),
+        const Text(
+          '- Oleh User A',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
       ],
     );
   }
@@ -277,7 +396,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Pilihan Rasa', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          'Pilihan Rasa',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
         Wrap(
           spacing: 8.0,
           children: [
@@ -304,14 +426,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, color: Colors.teal),
+                icon: const Icon(
+                  Icons.remove_circle_outline,
+                  color: Colors.teal,
+                ),
                 onPressed: () {
                   setState(() {
                     if (quantity > 1) quantity--;
                   });
                 },
               ),
-              Text('$quantity', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                '$quantity',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, color: Colors.teal),
                 onPressed: () {
@@ -328,15 +459,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${widget.product.name} berhasil ditambahkan!')),
+                  SnackBar(
+                    content: Text(
+                      '${widget.product.name} berhasil ditambahkan!',
+                    ),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: Text('Tambah ke Keranjang (Rp ${widget.product.price * quantity})', style: const TextStyle(color: Colors.white, fontSize: 16)),
+              child: Text(
+                'Tambah ke Keranjang (Rp ${widget.product.price * quantity})',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
           ),
         ],
@@ -344,7 +484,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 }
-
 
 /// =======================================================================
 /// 3. R. DRIVER CONTACT (message, message-attachment, call)
@@ -360,7 +499,11 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages = [
-    {'text': 'Halo, saya sudah sampai di depan restoran.', 'isMe': false, 'time': '10:05'},
+    {
+      'text': 'Halo, saya sudah sampai di depan restoran.',
+      'isMe': false,
+      'time': '10:05',
+    },
     {'text': 'Oke, saya tunggu di lobi.', 'isMe': true, 'time': '10:06'},
     // R. message 2
   ];
@@ -369,13 +512,12 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_messageController.text.trim().isNotEmpty) {
       setState(() {
         _messages.add({
-          'text': _messageController.text.trim(), 
-          'isMe': true, 
-          'time': DateTime.now().toString().substring(11, 16)
+          'text': _messageController.text.trim(),
+          'isMe': true,
+          'time': DateTime.now().toString().substring(11, 16),
         });
       });
       // Logika Firestore: Kirim pesan ke subkoleksi 'driver_chats'
-      print("Mengirim pesan: ${_messageController.text}");
       _messageController.clear();
     }
   }
@@ -384,13 +526,19 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Driver Budi (R. driver contact)'),
+        title: const Text('Driver Budi'),
         backgroundColor: Colors.teal,
         actions: [
           // R. call
-          IconButton(icon: const Icon(Icons.call), onPressed: () => print('Memanggil Driver Budi (R. calling)')), 
+          IconButton(
+            icon: const Icon(Icons.call),
+            onPressed: () { /* Handle call */ },
+          ),
           // R. report account &bug
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () => print('Laporkan Driver')), 
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () { /* Handle report */ },
+          ),
         ],
       ),
       body: Column(
@@ -421,7 +569,9 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         padding: const EdgeInsets.all(12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+        ),
         decoration: BoxDecoration(
           color: isMe ? Colors.teal : Colors.grey[300],
           borderRadius: BorderRadius.only(
@@ -432,7 +582,9 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         child: Column(
-          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Text(
               message['text'] as String,
@@ -441,7 +593,10 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(height: 4),
             Text(
               message['time'] as String,
-              style: TextStyle(fontSize: 10, color: isMe ? Colors.white70 : Colors.black54),
+              style: TextStyle(
+                fontSize: 10,
+                color: isMe ? Colors.white70 : Colors.black54,
+              ),
             ),
           ],
         ),
@@ -458,17 +613,23 @@ class _ChatScreenState extends State<ChatScreen> {
           // R. message-attachment
           IconButton(
             icon: const Icon(Icons.attach_file, color: Colors.teal),
-            onPressed: () => print('Melampirkan file/gambar'), 
+            onPressed: () { /* Handle attachment */ },
           ),
           Expanded(
             child: TextField(
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: 'Ketik pesan Anda...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
                 filled: true,
                 fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
               ),
             ),
           ),
@@ -481,7 +642,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
 
 /// =======================================================================
 /// 4. X. NOTIFICATION (Notification, search)
@@ -497,19 +657,43 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String _searchQuery = '';
 
   final List<Map<String, dynamic>> _allNotifications = [
-    {'title': 'Pesanan Selesai!', 'body': 'Pesanan #12345 telah berhasil diantar.', 'type': 'order', 'read': false},
-    {'title': 'Promo Terbaru', 'body': 'Diskon 20% untuk semua makanan hari ini!', 'type': 'promo', 'read': true},
-    {'title': 'Peringatan', 'body': 'Akses lokasi Anda dimatikan.', 'type': 'info', 'read': false},
-    {'title': 'Driver Tiba', 'body': 'Driver Anda sudah tiba di lokasi penjemputan.', 'type': 'order', 'read': true},
+    {
+      'title': 'Pesanan Selesai!',
+      'body': 'Pesanan #12345 telah berhasil diantar.',
+      'type': 'order',
+      'read': false,
+    },
+    {
+      'title': 'Promo Terbaru',
+      'body': 'Diskon 20% untuk semua makanan hari ini!',
+      'type': 'promo',
+      'read': true,
+    },
+    {
+      'title': 'Peringatan',
+      'body': 'Akses lokasi Anda dimatikan.',
+      'type': 'info',
+      'read': false,
+    },
+    {
+      'title': 'Driver Tiba',
+      'body': 'Driver Anda sudah tiba di lokasi penjemputan.',
+      'type': 'order',
+      'read': true,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     final filteredNotifications = _allNotifications.where((n) {
-      if (_searchQuery.isEmpty) return true;
+      if (_searchQuery.isEmpty) {
+        return true;
+      }
       // X. notification_search
-      return n['title'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             n['body'].toLowerCase().contains(_searchQuery.toLowerCase());
+      final title = n['title'] as String? ?? '';
+      final body = n['body'] as String? ?? '';
+      return title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          body.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
     return Scaffold(
@@ -544,35 +728,42 @@ class _NotificationScreenState extends State<NotificationScreen> {
               itemCount: filteredNotifications.length,
               itemBuilder: (context, index) {
                 final notification = filteredNotifications[index];
+                final isRead = notification['read'] as bool? ?? false;
+                final type = notification['type'] as String? ?? 'info';
+
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: notification['read'] ? Colors.grey[400] : Colors.teal,
+                    backgroundColor: isRead
+                        ? Colors.grey[400]
+                        : Colors.teal,
                     child: Icon(
-                      notification['type'] == 'order'
+                      type == 'order'
                           ? Icons.receipt_long
-                          : notification['type'] == 'promo'
-                              ? Icons.campaign
-                              : Icons.info,
+                          : type == 'promo'
+                          ? Icons.campaign
+                          : Icons.info,
                       color: Colors.white,
                     ),
                   ),
                   title: Text(
-                    notification['title'],
+                    notification['title'] as String? ?? '',
                     style: TextStyle(
-                      fontWeight: notification['read'] ? FontWeight.normal : FontWeight.bold,
+                      fontWeight: isRead
+                          ? FontWeight.normal
+                          : FontWeight.bold,
                     ),
                   ),
-                  subtitle: Text(notification['body']),
-                  trailing: notification['read']
-                      ? null
-                      : Container(
+                  subtitle: Text(notification['body'] as String? ?? ''),
+                  trailing: !isRead
+                      ? Container(
                           width: 10,
                           height: 10,
                           decoration: const BoxDecoration(
                             color: Colors.red,
                             shape: BoxShape.circle,
                           ),
-                        ),
+                        )
+                      : null,
                 );
               },
             ),

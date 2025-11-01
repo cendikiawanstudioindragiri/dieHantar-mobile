@@ -29,13 +29,7 @@ class CartProvider with ChangeNotifier {
         ),
       );
     } else {
-      _items.putIfAbsent(
-        name,
-        () => CartItem(
-          name: name,
-          price: price,
-        ),
-      );
+      _items.putIfAbsent(name, () => CartItem(name: name, price: price));
     }
     notifyListeners();
   }

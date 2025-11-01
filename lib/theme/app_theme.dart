@@ -20,9 +20,7 @@ class AppTheme {
         seedColor: Colors.deepPurple,
         brightness: Brightness.dark,
       ),
-      textTheme: GoogleFonts.latoTextTheme(
-        ThemeData.dark().textTheme,
-      ),
+      textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
     );
   }
 }

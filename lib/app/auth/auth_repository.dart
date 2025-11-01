@@ -11,12 +11,13 @@ class AuthRepository {
 
   Stream<User?> get authStateChanges => _authService.authStateChanges;
 
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       developer.log(e.message ?? 'An error occurred during sign-in.');
@@ -24,12 +25,13 @@ class AuthRepository {
     }
   }
 
-  Future<User?> signUpWithEmailAndPassword(String email, String password) async {
+  Future<User?> signUpWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       developer.log(e.message ?? 'An error occurred during sign-up.');
@@ -41,16 +43,23 @@ class AuthRepository {
     try {
       await currentUser?.updatePhotoURL(photoURL);
     } on FirebaseAuthException catch (e) {
-      developer.log(e.message ?? 'An error occurred while updating the profile picture.');
+      developer.log(
+        e.message ?? 'An error occurred while updating the profile picture.',
+      );
     }
   }
 
-  Future<void> updateProfile({required String displayName, required String photoURL}) async {
+  Future<void> updateProfile({
+    required String displayName,
+    required String photoURL,
+  }) async {
     try {
       await currentUser?.updateDisplayName(displayName);
       await currentUser?.updatePhotoURL(photoURL);
     } on FirebaseAuthException catch (e) {
-      developer.log(e.message ?? 'An error occurred while updating the profile.');
+      developer.log(
+        e.message ?? 'An error occurred while updating the profile.',
+      );
     }
   }
 

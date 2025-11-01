@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class HomeFilledScreen extends StatelessWidget {
@@ -6,10 +5,6 @@ class HomeFilledScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Home Filled Screen'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Home Filled Screen')));
   }
 }

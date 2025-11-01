@@ -3,24 +3,45 @@ import 'package:provider/provider.dart';
 import 'package:myapp/providers/review_provider.dart';
 import 'package:myapp/models/review_model.dart';
 
-class ReviewsListScreen extends StatelessWidget {
+class ReviewsListScreen extends StatefulWidget {
   final String restaurantId;
 
   const ReviewsListScreen({super.key, required this.restaurantId});
 
   @override
+  State<ReviewsListScreen> createState() => _ReviewsListScreenState();
+}
+
+class _ReviewsListScreenState extends State<ReviewsListScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch reviews when the screen loads
+    Provider.of<ReviewProvider>(
+      context,
+      listen: false,
+    ).getReviewsForRestaurant(widget.restaurantId).then((_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final reviewProvider = Provider.of<ReviewProvider>(context);
-    final reviews = reviewProvider.getReviewsForRestaurant(restaurantId);
+    final reviews = reviewProvider.reviews[widget.restaurantId] ?? [];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ulasan Pelanggan'),
-      ),
-      body: reviews.isEmpty
-          ? const Center(
-              child: Text('Belum ada ulasan untuk restoran ini.'),
-            )
+      appBar: AppBar(title: const Text('Ulasan Pelanggan')),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : reviews.isEmpty
+          ? const Center(child: Text('Belum ada ulasan untuk restoran ini.'))
           : ListView.builder(
               itemCount: reviews.length,
               itemBuilder: (ctx, i) => _buildReviewItem(context, reviews[i]),
@@ -39,7 +60,10 @@ class ReviewsListScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(review.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  review.userName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '${review.timestamp.day}/${review.timestamp.month}/${review.timestamp.year}',
                   style: const TextStyle(color: Colors.grey, fontSize: 12),

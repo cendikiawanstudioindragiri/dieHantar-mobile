@@ -8,21 +8,41 @@ class SecurityService {
     print("Memanggil Python CF: set_pin dengan PIN $pin");
     return true; // Sukses
   }
+
   Future<bool> authenticateBiometrics() async {
     // Logika otentikasi biometrik menggunakan 'local_auth' Flutter
-    await Future.delayed(const Duration(seconds: 1)); 
-    return true; 
+    await Future.delayed(const Duration(seconds: 1));
+    return true;
   }
 }
 
 class NotificationService {
   // X. Notification_List
   List<Map<String, dynamic>> getNotifications() => [
-    {'id': '1', 'title': 'Pesanan Selesai!', 'body': 'Pesanan #105 telah tiba di tujuan Anda.', 'isRead': false, 'time': '5 menit lalu'},
-    {'id': '2', 'title': 'Diskon 50% Menunggumu', 'body': 'Gunakan kode PROMO50 untuk semua makanan.', 'isRead': true, 'time': '1 jam lalu'},
-    {'id': '3', 'title': 'Driver Tiba', 'body': 'Driver Budi telah tiba di lokasi penjemputan.', 'isRead': true, 'time': 'Kemarin'},
+    {
+      'id': '1',
+      'title': 'Pesanan Selesai!',
+      'body': 'Pesanan #105 telah tiba di tujuan Anda.',
+      'isRead': false,
+      'time': '5 menit lalu',
+    },
+    {
+      'id': '2',
+      'title': 'Diskon 50% Menunggumu',
+      'body': 'Gunakan kode PROMO50 untuk semua makanan.',
+      'isRead': true,
+      'time': '1 jam lalu',
+    },
+    {
+      'id': '3',
+      'title': 'Driver Tiba',
+      'body': 'Driver Budi telah tiba di lokasi penjemputan.',
+      'isRead': true,
+      'time': 'Kemarin',
+    },
   ];
-  void markAsRead(String id) => print("Notifikasi $id ditandai sebagai sudah dibaca.");
+  void markAsRead(String id) =>
+      print("Notifikasi $id ditandai sebagai sudah dibaca.");
 }
 // ----------------------------
 
@@ -47,7 +67,7 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
   void initState() {
     super.initState();
     // Memuat status awal dari service/profil pengguna
-    _isPinSet = true; 
+    _isPinSet = true;
     _isTouchIdActive = true;
   }
 
@@ -60,7 +80,7 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
 
     setState(() => _message = "Mengatur PIN...");
     final success = await _securityService.setPin(pin); // Panggil CF Python
-    
+
     if (success) {
       setState(() {
         _isPinSet = true;
@@ -82,7 +102,10 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
           _message = "Autentikasi Biometrik berhasil diaktifkan (G).";
         });
       } else {
-        setState(() => _message = "Gagal mengaktifkan biometrik. Pastikan sensor berfungsi.");
+        setState(
+          () => _message =
+              "Gagal mengaktifkan biometrik. Pastikan sensor berfungsi.",
+        );
       }
     } else {
       setState(() {
@@ -95,7 +118,10 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pengaturan Keamanan'), backgroundColor: Colors.deepOrange),
+      appBar: AppBar(
+        title: const Text('Pengaturan Keamanan'),
+        backgroundColor: Colors.deepOrange,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -104,17 +130,32 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
             // --- G. Touch ID Security ---
             SwitchListTile(
               title: const Text('Akses Biometrik (Touch ID/Face ID)'),
-              subtitle: const Text('Gunakan sidik jari atau wajah untuk login cepat.'),
+              subtitle: const Text(
+                'Gunakan sidik jari atau wajah untuk login cepat.',
+              ),
               value: _isTouchIdActive,
-              onChanged: _isPinSet ? _handleTouchIdToggle : null, // Hanya bisa diaktifkan jika PIN sudah diatur
+              onChanged: _isPinSet
+                  ? _handleTouchIdToggle
+                  : null, // Hanya bisa diaktifkan jika PIN sudah diatur
               secondary: const Icon(Icons.fingerprint, color: Colors.blueGrey),
             ),
-            
+
             const Divider(),
 
             // --- F. Set PIN Security ---
-            Text('PIN Keamanan (F)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: _isPinSet ? Colors.green : Colors.deepOrange)),
-            Text(_isPinSet ? 'PIN Anda sudah diatur.' : 'PIN belum diatur. Harap atur PIN untuk keamanan transaksi.'),
+            Text(
+              'PIN Keamanan (F)',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: _isPinSet ? Colors.green : Colors.deepOrange,
+              ),
+            ),
+            Text(
+              _isPinSet
+                  ? 'PIN Anda sudah diatur.'
+                  : 'PIN belum diatur. Harap atur PIN untuk keamanan transaksi.',
+            ),
             const SizedBox(height: 10),
 
             TextField(
@@ -123,7 +164,9 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
               maxLength: 6,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: _isPinSet ? 'Ubah PIN Baru' : 'Atur PIN Baru (6 digit)',
+                labelText: _isPinSet
+                    ? 'Ubah PIN Baru'
+                    : 'Atur PIN Baru (6 digit)',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -141,7 +184,14 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
             const SizedBox(height: 10),
 
             if (_message.isNotEmpty)
-              Text(_message, style: TextStyle(color: _message.contains("berhasil") ? Colors.green : Colors.red)),
+              Text(
+                _message,
+                style: TextStyle(
+                  color: _message.contains("berhasil")
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ),
           ],
         ),
       ),
@@ -154,13 +204,13 @@ class _SecuritySetupScreenState extends State<SecuritySetupScreen> {
 /// =======================================================================
 class NotificationScreen extends StatelessWidget {
   final NotificationService _notificationService = NotificationService();
-  
+
   NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final notifications = _notificationService.getNotifications();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pusat Notifikasi (X)'),
@@ -170,7 +220,7 @@ class NotificationScreen extends StatelessWidget {
             icon: const Icon(Icons.mark_email_read),
             onPressed: () => print('Tandai semua sebagai sudah dibaca'),
             tooltip: 'Tandai Semua Sudah Dibaca',
-          )
+          ),
         ],
       ),
       body: ListView.builder(
@@ -182,10 +232,26 @@ class NotificationScreen extends StatelessWidget {
               notif['isRead'] ? Icons.mail_outline : Icons.mail,
               color: notif['isRead'] ? Colors.grey : Colors.blueAccent,
             ),
-            title: Text(notif['title'], style: TextStyle(fontWeight: notif['isRead'] ? FontWeight.normal : FontWeight.bold)),
-            subtitle: Text(notif['body'], maxLines: 2, overflow: TextOverflow.ellipsis),
-            trailing: Text(notif['time'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            tileColor: notif['isRead'] ? Colors.white : Colors.blueAccent.withOpacity(0.05),
+            title: Text(
+              notif['title'],
+              style: TextStyle(
+                fontWeight: notif['isRead']
+                    ? FontWeight.normal
+                    : FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              notif['body'],
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: Text(
+              notif['time'],
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            tileColor: notif['isRead']
+                ? Colors.white
+                : Colors.blueAccent.withOpacity(0.05),
             onTap: () {
               _notificationService.markAsRead(notif['id']);
               // Navigasi ke detail terkait (misal: Order Tracking Screen)
@@ -203,7 +269,7 @@ class NotificationScreen extends StatelessWidget {
 /// =======================================================================
 class FinalOrderReviewScreen extends StatefulWidget {
   final String orderId;
-  
+
   const FinalOrderReviewScreen({super.key, required this.orderId});
 
   @override
@@ -222,7 +288,7 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
       print('Rating minimal 1 bintang.');
       return;
     }
-    
+
     // Panggil Cloud Function Python untuk memproses Rating & Tipping
     print('--- Mengirim Review ke CF Python ---');
     print('Order ID: ${widget.orderId}');
@@ -240,21 +306,33 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Review Pesanan Selesai'), backgroundColor: Colors.green),
+      appBar: AppBar(
+        title: const Text('Review Pesanan Selesai'),
+        backgroundColor: Colors.green,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // U. Rating - Bintang
-            const Text('Bagaimana pengalamanmu?', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const Text('Berikan rating untuk layanan ini.', style: TextStyle(color: Colors.grey)),
+            const Text(
+              'Bagaimana pengalamanmu?',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const Text(
+              'Berikan rating untuk layanan ini.',
+              style: TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 20),
 
             Center(
               child: Column(
                 children: [
-                  Text('$_rating Bintang', style: const TextStyle(fontSize: 36, color: Colors.amber)),
+                  Text(
+                    '$_rating Bintang',
+                    style: const TextStyle(fontSize: 36, color: Colors.amber),
+                  ),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -279,7 +357,10 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
             const SizedBox(height: 30),
 
             // U. Review - Komentar
-            const Text('Tulis Ulasan (Opsional)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Tulis Ulasan (Opsional)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             TextField(
               onChanged: (value) => _reviewText = value,
@@ -292,28 +373,43 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
             const SizedBox(height: 30),
 
             // U. Rating_Tipping
-            const Text('Berikan Tip untuk Driver', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Text('Tip sepenuhnya milik Driver.', style: TextStyle(color: Colors.grey)),
+            const Text(
+              'Berikan Tip untuk Driver',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Text(
+              'Tip sepenuhnya milik Driver.',
+              style: TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 10),
 
             Wrap(
               spacing: 10,
               children: [
-                ..._tipOptions.map((amount) => ChoiceChip(
-                  label: Text('Rp $amount'),
-                  selected: _tipAmount == amount,
-                  selectedColor: Colors.green.shade100,
-                  onSelected: (selected) {
-                    setState(() {
-                      _tipAmount = selected ? amount : 0;
-                    });
-                  },
-                )),
+                ..._tipOptions.map(
+                  (amount) => ChoiceChip(
+                    label: Text('Rp $amount'),
+                    selected: _tipAmount == amount,
+                    selectedColor: Colors.green.shade100,
+                    onSelected: (selected) {
+                      setState(() {
+                        _tipAmount = selected ? amount : 0;
+                      });
+                    },
+                  ),
+                ),
                 ActionChip(
-                  label: Text(_tipAmount != 0 && !_tipOptions.contains(_tipAmount) ? 'Rp $_tipAmount (Custom)' : 'Custom'),
+                  label: Text(
+                    _tipAmount != 0 && !_tipOptions.contains(_tipAmount)
+                        ? 'Rp $_tipAmount (Custom)'
+                        : 'Custom',
+                  ),
                   onPressed: () => print('Buka dialog input tip kustom'),
-                  backgroundColor: _tipAmount != 0 && !_tipOptions.contains(_tipAmount) ? Colors.green.shade50 : Colors.grey.shade200,
-                )
+                  backgroundColor:
+                      _tipAmount != 0 && !_tipOptions.contains(_tipAmount)
+                      ? Colors.green.shade50
+                      : Colors.grey.shade200,
+                ),
               ],
             ),
             const SizedBox(height: 40),
@@ -325,9 +421,14 @@ class _FinalOrderReviewScreenState extends State<FinalOrderReviewScreen> {
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: const Text('Kirim Ulasan & Tip', style: TextStyle(fontSize: 18)),
+              child: const Text(
+                'Kirim Ulasan & Tip',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class LoadingStartScreen extends StatelessWidget {
@@ -6,10 +5,6 @@ class LoadingStartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Loading Start Screen'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Loading Start Screen')));
   }
 }

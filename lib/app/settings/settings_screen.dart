@@ -6,12 +6,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pengaturan'),
-      ),
-      body: const Center(
-        child: Text('Ini adalah halaman pengaturan.'),
-      ),
+      appBar: AppBar(title: const Text('Pengaturan')),
+      body: const Center(child: Text('Ini adalah halaman pengaturan.')),
     );
   }
 }

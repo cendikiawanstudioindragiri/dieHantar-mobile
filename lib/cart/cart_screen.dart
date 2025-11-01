@@ -11,9 +11,7 @@ class CartScreen extends StatelessWidget {
     final cart = Provider.of<CartProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Keranjang Belanja'),
-      ),
+      appBar: AppBar(title: const Text('Keranjang Belanja')),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -22,20 +20,23 @@ class CartScreen extends StatelessWidget {
               itemBuilder: (ctx, i) {
                 final cartItem = cart.items.values.toList()[i];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 4,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Padding(
                           padding: const EdgeInsets.all(5),
-                          child: FittedBox(
-                            child: Text('Rp${cartItem.price}'),
-                          ),
+                          child: FittedBox(child: Text('Rp${cartItem.price}')),
                         ),
                       ),
                       title: Text(cartItem.name),
-                      subtitle: Text('Total: Rp${cartItem.price * cartItem.quantity}'),
+                      subtitle: Text(
+                        'Total: Rp${cartItem.price * cartItem.quantity}',
+                      ),
                       trailing: Text('${cartItem.quantity} x'),
                     ),
                   ),
@@ -50,10 +51,7 @@ class CartScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  const Text(
-                    'Total',
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  const Text('Total', style: TextStyle(fontSize: 20)),
                   const Spacer(),
                   Chip(
                     label: Text(
@@ -67,11 +65,11 @@ class CartScreen extends StatelessWidget {
                       context.go('/checkout');
                     },
                     child: const Text('CHECKOUT'),
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

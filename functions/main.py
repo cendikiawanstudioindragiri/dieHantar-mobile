@@ -1,80 +1,48 @@
 
-from flask import Flask, request, jsonify
-from firebase_admin import auth, initialize_app
-import functions_framework
+from firebase_functions import https_fn
+from firebase_admin import initialize_app, firestore
+import json
 
-# Initialize Firebase Admin SDK
+# Inisialisasi Firebase Admin SDK
 initialize_app()
 
-@functions_framework.http
-def createOrderAPI(request):
+@https_fn.on_request()
+def reviewsAPI(req: https_fn.Request) -> https_fn.Response:
     """
-    HTTP Function to create a new order.
+    Handles GET and POST requests for reviews.
+    GET: Fetches reviews for a given restaurantId.
+    POST: Submits a new review.
     """
-    try:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({"success": False, "message": "Authentication required."}), 401
+    if req.method == "GET":
+        restaurant_id = req.args.get("restaurantId")
+        if not restaurant_id:
+            return https_fn.Response("Missing restaurantId parameter", status=400)
+
+        db = firestore.client()
+        reviews_ref = db.collection(f"restaurants/{restaurant_id}/reviews")
+        reviews = [doc.to_dict() for doc in reviews_ref.stream()]
         
-        id_token = auth_header.split(' ')[1]
-        decoded_token = auth.verify_id_token(id_token)
-        uid = decoded_token['uid']
+        return https_fn.Response(json.dumps({"success": True, "reviews": reviews}),
+                                 content_type="application/json")
 
-        if request.method != 'POST':
-            return jsonify({"success": False, "message": "HTTP method must be POST."}), 405
+    elif req.method == "POST":
+        # Autentikasi akan dibahas di langkah selanjutnya
+        # Untuk saat ini, kita akan melewati verifikasi token
         
-        request_json = request.get_json(silent=True)
-        if not request_json:
-            return jsonify({"success": False, "message": "Request body cannot be empty."}), 400
-        
-        # In a real application, you would have a service to handle order creation
-        # from services.order_service import create_new_order
-        # result = create_new_order(uid, order_details)
+        try:
+            review_data = req.get_json()
+            restaurant_id = review_data.get("restaurantId")
+            if not restaurant_id:
+                return https_fn.Response("Missing restaurantId in request body", status=400)
 
-        # For now, we'll simulate a successful order creation
-        order_id = f"mock_order_{uid[:5]}"
-        total_amount = 100000
-
-        return jsonify({
-            "success": True, 
-            "order_id": order_id,
-            "total_amount": total_amount
-        }), 200
-
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Internal server error: {str(e)}"}), 500
-
-
-@functions_framework.http
-def cancelOrderAPI(request):
-    """
-    HTTP Function to cancel an order.
-    """
-    try:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({"success": False, "message": "Authentication required."}), 401
+            db = firestore.client()
+            db.collection(f"restaurants/{restaurant_id}/reviews").add(review_data)
             
-        id_token = auth_header.split(' ')[1]
-        decoded_token = auth.verify_id_token(id_token)
-        uid = decoded_token['uid']
+            return https_fn.Response(json.dumps({"success": True}),
+                                     content_type="application/json",
+                                     status=201)
+        except Exception as e:
+            return https_fn.Response(f"Error submitting review: {e}", status=500)
 
-        if request.method != 'POST':
-            return jsonify({"success": False, "message": "HTTP method must be POST."}), 405
-             
-        request_json = request.get_json(silent=True)
-        order_id = request_json.get('order_id')
-        reason = request_json.get('reason')
+    return https_fn.Response("Method not allowed", status=405)
 
-        if not order_id or not reason:
-            return jsonify({"success": False, "message": "Order ID and reason for cancellation are required."}), 400
-
-        # In a real application, you would have a service to handle order cancellation
-        # from services.order_service import cancel_order
-        # result = cancel_order(order_id, uid, reason)
-
-        # For now, we'll simulate a successful cancellation
-        return jsonify({"success": True, "message": "Order has been successfully canceled."}), 200
-
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Internal server error: {str(e)}"}), 500

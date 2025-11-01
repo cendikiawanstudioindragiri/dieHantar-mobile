@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:myapp/routes/app_router.dart';
-import 'package:myapp/theme/app_theme.dart';
-import 'package:myapp/features/auth/application/auth_notifier.dart';
-import 'package:myapp/providers/cart_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:myapp/food/models/cart_model.dart';
 import 'package:myapp/providers/review_provider.dart';
+import 'package:myapp/router/router.dart';
+import 'firebase_options.dart';
+import 'package:myapp/auth/auth_service.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AuthNotifier()),
-        ChangeNotifierProvider(create: (context) => CartProvider()),
-        ChangeNotifierProvider(create: (context) => ReviewProvider()),
-      ],
-      child: const MyApp(),
-    ),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,13 +20,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: AppRouter.router,
-      title: 'Flutter App',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, 
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()), // Tambahkan CartProvider
+      ],
+      child: MaterialApp.router(
+        title: 'dieHantar Super App',
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        routerConfig: router,
+      ),
     );
   }
 }

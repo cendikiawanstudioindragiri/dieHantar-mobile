@@ -17,7 +17,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _placeOrder() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       // Tampilkan dialog konfirmasi
       showDialog(
         context: context,
@@ -45,9 +45,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final cart = Provider.of<CartProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Checkout'),
-      ),
+      appBar: AppBar(title: const Text('Checkout')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -122,10 +120,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Total Pembayaran', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Total Pembayaran',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             Text(
               'Rp${cart.totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.teal,
+              ),
             ),
           ],
         ),

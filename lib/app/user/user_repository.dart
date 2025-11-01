@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/models/user_model.dart' as model;
 
@@ -6,7 +5,7 @@ class UserRepository {
   final FirebaseFirestore _firestore;
 
   UserRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<void> createUser(model.User user) {
     return _firestore.collection('users').doc(user.uid).set({

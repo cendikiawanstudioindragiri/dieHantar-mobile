@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class SignupTyping3Screen extends StatelessWidget {
@@ -6,10 +5,6 @@ class SignupTyping3Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Signup Typing 3 Screen'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Signup Typing 3 Screen')));
   }
 }

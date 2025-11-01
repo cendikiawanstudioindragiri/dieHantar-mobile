@@ -1,1 +1,42 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"cendikiawanstudiosindragiri","appId":"1:890873103309:android:05724dfe1345e437c2ba84","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"cendikiawanstudiosindragiri","configurations":{"android":"1:890873103309:android:05724dfe1345e437c2ba84","web":"1:890873103309:web:4e99c779cedf6d3ac2ba84"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "cendikiawanstudiosindragiri",
+          "appId": "1:890873103309:android:05724dfe1345e437c2ba84",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "cendikiawanstudiosindragiri",
+          "configurations": {
+            "android": "1:890873103309:android:05724dfe1345e437c2ba84",
+            "web": "1:890873103309:web:4e99c779cedf6d3ac2ba84"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "venv",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ],
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

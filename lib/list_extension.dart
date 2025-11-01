@@ -1,4 +1,3 @@
-
 extension RemoveMiddle<T> on List<T> {
   T removeMiddle() {
     if (isEmpty) {

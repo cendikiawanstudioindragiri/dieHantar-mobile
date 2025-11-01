@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class IntroduceStep3Screen extends StatelessWidget {
@@ -6,10 +5,6 @@ class IntroduceStep3Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Introduce Step 3 Screen'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Introduce Step 3 Screen')));
   }
 }

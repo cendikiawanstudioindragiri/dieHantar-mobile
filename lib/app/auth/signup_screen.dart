@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:myapp/app/auth/auth_repository.dart';
 import 'package:provider/provider.dart';
@@ -18,9 +17,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final authRepository = Provider.of<AuthRepository>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Form(
         key: _formKey,
         child: Column(

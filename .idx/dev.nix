@@ -3,36 +3,44 @@
 { pkgs, ... }: {
   # Which nixpkgs channel to use.
   channel = "stable-24.05"; # or "unstable"
-  # Use https://search.nixos.org/packages to find packages
+
+  # Use https://search.nixos.org/packages to find packages for your environment.
   packages = [
+    # Essential for Flutter development
+    pkgs.flutter
+    pkgs.dart
+    # Required for the Android toolchain
     pkgs.jdk21
     pkgs.unzip
+    # Firebase CLI for seamless integration
+    pkgs.firebase-tools
   ];
-  # Sets environment variables in the workspace
-  env = {};
+
+  # Sets environment variables in the workspace.
+  env = {
+    # Set JAVA_HOME for the Android toolchain
+    JAVA_HOME = "${pkgs.jdk21}";
+  };
+
+  # Firebase Studio-specific settings
   idx = {
-    # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
+    # VS Code extensions to install
+    # Search for extensions on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       "Dart-Code.flutter"
       "Dart-Code.dart-code"
     ];
-    workspace = {
-      # Runs when a workspace is first created with this `dev.nix` file
-      onCreate = { };
-      # To run something each time the workspace is (re)started, use the `onStart` hook
-    };
-    # Enable previews and customize configuration
+
+    # Enable previews for hot reload
     previews = {
       enable = true;
-      previews = {
-        web = {
-          command = ["flutter" "run" "--machine" "-d" "web-server" "--web-hostname" "0.0.0.0" "--web-port" "$PORT"];
-          manager = "flutter";
-        };
-        android = {
-          command = ["flutter" "run" "--machine" "-d" "android" "-d" "localhost:5555"];
-          manager = "flutter";
-        };
+    };
+
+    # Commands to run on workspace startup
+    workspace = {
+      onStart = {
+        # Install Flutter dependencies automatically
+        get-deps = "flutter pub get";
       };
     };
   };

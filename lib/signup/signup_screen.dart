@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/app/auth/auth_repository.dart';
@@ -42,9 +41,13 @@ class _SignupScreenState extends State<SignupScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final authRepository =
-                        Provider.of<AuthRepository>(context, listen: false);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context); // Store the messenger
+                    final authRepository = Provider.of<AuthRepository>(
+                      context,
+                      listen: false,
+                    );
+                    final scaffoldMessenger = ScaffoldMessenger.of(
+                      context,
+                    ); // Store the messenger
                     try {
                       await authRepository.signUpWithEmailAndPassword(
                         _emailController.text,
@@ -53,7 +56,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Navigate to home screen or show success message
                     } catch (e) {
                       if (!mounted) return;
-                      scaffoldMessenger.showSnackBar( // Use the stored messenger
+                      scaffoldMessenger.showSnackBar(
+                        // Use the stored messenger
                         SnackBar(content: Text('Failed to sign up: $e')),
                       );
                     }
