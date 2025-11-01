@@ -1,76 +1,46 @@
 # blueprints/data_catalog.py
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
+from logger_config import get_logger
 from . import data_catalog_service as service
+from .auth_service import token_required
 
 # Definisikan Blueprint untuk katalog data
-data_catalog_bp = Blueprint('data_catalog_bp', __name__, url_prefix='/api/v1/catalog')
+data_catalog_bp = Blueprint('data_catalog', __name__, url_prefix='/api/v1/catalog')
+logger = get_logger('DataCatalogBlueprint')
 
-# --- Rute untuk Dashboard --- #
-
-@data_catalog_bp.route('/home/user/<string:uid>', methods=['GET'])
-def get_home_dashboard(uid):
-    """Endpoint untuk mendapatkan data utama halaman Home."""
-    # TODO: Tambahkan verifikasi token di sini untuk memastikan hanya pengguna
-    # yang terotentikasi yang dapat mengakses datanya sendiri.
-    result = service.get_home_dashboard_data(uid)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
-
-# --- Rute untuk Lokasi Pengguna --- #
-
-@data_catalog_bp.route('/users/<string:uid>/locations', methods=['GET'])
-def get_locations(uid):
-    """Endpoint untuk mendapatkan semua lokasi yang disimpan pengguna."""
-    # TODO: Amankan endpoint ini dengan verifikasi token.
-    result = service.get_user_locations(uid)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
-
-@data_catalog_bp.route('/users/<string:uid>/locations', methods=['POST'])
-def add_location(uid):
-    """Endpoint untuk menambahkan lokasi baru bagi pengguna."""
-    # TODO: Amankan endpoint ini dengan verifikasi token.
-    location_data = request.json
-    if not location_data:
-        return jsonify({"success": False, "message": "Request body tidak boleh kosong."}), 400
+@data_catalog_bp.route('/foods', methods=['GET'])
+# @token_required # Data makanan mungkin bersifat publik, token bisa jadi opsional.
+def get_all_foods():
+    """Endpoint untuk mendapatkan semua item makanan."""
+    try:
+        food_items = service.get_all_food_items()
+        # Konversi daftar objek FoodItem menjadi daftar dict
+        food_list_dict = [item.to_dict() for item in food_items]
         
-    result = service.add_user_location(uid, location_data)
-    if result["success"]:
-        return jsonify(result), 201  # 201 Created
-    return jsonify(result), 500
+        logger.info("Berhasil mengambil semua item makanan.")
+        return jsonify({"success": True, "data": food_list_dict}), 200
+    except RuntimeError as e:
+        logger.error(f"Gagal mengambil item makanan: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500
+    except Exception as e:
+        logger.error(f"Kesalahan tak terduga saat mengambil item makanan: {e}", exc_info=True)
+        return jsonify({"success": False, "message": "Terjadi kesalahan pada server."}), 500
 
-# --- Rute untuk Produk & Pencarian --- #
+@data_catalog_bp.route('/promotions', methods=['GET'])
+# @token_required # Promosi juga mungkin bersifat publik.
+def get_all_promotions():
+    """Endpoint untuk mendapatkan semua promosi."""
+    try:
+        promotions = service.get_all_promotions()
+        # Konversi daftar objek Promotion menjadi daftar dict
+        promo_list_dict = [promo.to_dict() for promo in promotions]
 
-@data_catalog_bp.route('/products/<string:category>', methods=['GET'])
-def get_products(category):
-    """Endpoint untuk mendapatkan produk berdasarkan kategori (foods, drinks, services)."""
-    limit = request.args.get('limit', 20, type=int)
-    result = service.get_products_by_category(category, limit)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 404 if "tidak valid" in result.get("message", "") else 500
-
-@data_catalog_bp.route('/products/search/<string:category>', methods=['GET'])
-def search_in_category(category):
-    """Endpoint untuk mencari produk dalam sebuah kategori."""
-    query = request.args.get('q')
-    if not query:
-        return jsonify({"success": False, "message": "Parameter query 'q' dibutuhkan."}), 400
-
-    result = service.search_products(category, query)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
-
-# --- Rute untuk Promosi --- #
-
-@data_catalog_bp.route('/promotions/active', methods=['GET'])
-def get_promotions():
-    """Endpoint untuk mendapatkan semua promosi yang aktif."""
-    result = service.get_active_promotions()
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
+        logger.info("Berhasil mengambil semua promosi.")
+        return jsonify({"success": True, "data": promo_list_dict}), 200
+    except RuntimeError as e:
+        logger.error(f"Gagal mengambil promosi: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500
+    except Exception as e:
+        logger.error(f"Kesalahan tak terduga saat mengambil promosi: {e}", exc_info=True)
+        return jsonify({"success": False, "message": "Terjadi kesalahan pada server."}), 500

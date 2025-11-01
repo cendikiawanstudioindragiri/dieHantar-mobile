@@ -1,3 +1,8 @@
 #!/bin/sh
+
+# Aktifkan virtual environment
 source .venv/bin/activate
-python -u -m flask --app app run --debug
+
+# Jalankan server pengembangan yang baru menggunakan python.
+# Opsi -u memastikan bahwa output (seperti log) tidak di-buffer.
+python -u dev_server.py

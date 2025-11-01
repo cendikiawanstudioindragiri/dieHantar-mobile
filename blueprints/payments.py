@@ -1,71 +1,66 @@
 # blueprints/payments.py
 
 from flask import Blueprint, request, jsonify
-from . import payment_service as service
+from logger_config import get_logger
+from .auth_service import token_required
+from . import payments_service as service
 
-# Definisikan Blueprint untuk pembayaran
-payments_bp = Blueprint('payments_bp', __name__, url_prefix='/api/v1/payments')
+payments_bp = Blueprint('payments', __name__, url_prefix='/api/v1')
+logger = get_logger('PaymentsBlueprint')
 
-# --- Rute untuk Metode Pembayaran --- #
+@payments_bp.route('/orders/<string:order_id>/pay', methods=['POST'])
+@token_required
+def initiate_payment_endpoint(uid, order_id):
+    """Endpoint aman untuk memulai proses pembayaran untuk sebuah pesanan."""
+    try:
+        transaction = service.initiate_order_payment(order_id=order_id, requester_uid=uid)
+        logger.info(f"Berhasil membuat transaksi pembayaran {transaction.id} untuk pesanan {order_id}.")
+        return jsonify({
+            "success": True,
+            "message": "Transaksi pembayaran berhasil dibuat.",
+            "transaction": transaction.to_dict()
+        }), 200
 
-@payments_bp.route('/methods', methods=['POST'])
-def add_payment_method():
-    """Endpoint untuk menambahkan metode pembayaran baru (dengan token)."""
-    data = request.json
-    uid = data.get('uid')
-    card_data = data.get('card_data') # e.g., {'token': '...', 'last4': '...′, 'brand': '...'}
+    except ValueError as e:
+        logger.warning(f"Permintaan pembayaran untuk pesanan {order_id} oleh UID {uid} gagal: {e}")
+        # Status bisa 400 (Bad Request) atau 409 (Conflict)
+        status_code = 409 if "status" in str(e) else 400
+        return jsonify({"success": False, "message": str(e)}), status_code
+    except PermissionError as e:
+        logger.warning(f"Akses ditolak untuk UID {uid} pada pesanan {order_id}: {e}")
+        return jsonify({"success": False, "message": str(e)}), 403
+    except RuntimeError as e:
+        logger.error(f"Kesalahan server saat membuat pembayaran untuk {order_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500
 
-    # TODO: Amankan endpoint ini dengan verifikasi token otentikasi
-    if not uid or not card_data or 'token' not in card_data:
-        return jsonify({"success": False, "message": "UID dan token kartu dibutuhkan."}), 400
+@payments_bp.route('/payments/webhook', methods=['POST'])
+def handle_payment_webhook_endpoint():
+    """
+    Endpoint untuk menerima notifikasi status pembayaran dari gerbang pembayaran.
+    Endpoint ini harus selalu merespons dengan cepat dan andal.
+    """
+    payload = request.get_json()
+    if not payload:
+        logger.warning("Menerima permintaan webhook kosong.")
+        return jsonify({"status": "received", "error": "empty payload"}), 400
 
-    result = service.add_new_payment_method(uid, card_data)
-    if result["success"]:
-        return jsonify(result), 201
-    return jsonify(result), 500
-
-# --- Rute untuk Webhook dari Payment Gateway --- #
-
-@payments_bp.route('/webhook', methods=['POST'])
-def payment_webhook():
-    """Endpoint untuk menerima notifikasi dari Payment Gateway."""
-    payload = request.json
-    # TODO: Tambahkan verifikasi signature webhook di sini
-    result = service.handle_payment_webhook(payload)
-    return jsonify(result), 200
-
-# --- Rute untuk Review dan Tip --- #
-
-@payments_bp.route('/review', methods=['POST'])
-def submit_review():
-    """Endpoint untuk mengirimkan rating dan review untuk sebuah pesanan."""
-    data = request.json
-    uid = data.get('uid')
-    order_id = data.get('order_id')
-    rating_data = data.get('rating_data')
-
-    # TODO: Amankan endpoint ini dan verifikasi kepemilikan pesanan
-    if not all([uid, order_id, rating_data]):
-        return jsonify({"success": False, "message": "Data tidak lengkap."}), 400
-
-    result = service.submit_order_rating_review(uid, order_id, rating_data)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
-
-@payments_bp.route('/givethanks', methods=['POST'])
-def give_thanks():
-    """Endpoint untuk memberikan tip kepada driver."""
-    data = request.json
-    driver_id = data.get('driver_id')
-    amount = data.get('amount')
-
-    if not driver_id or not isinstance(amount, int) or amount <= 0:
-        return jsonify({"success": False, "message": "ID driver dan jumlah tip yang valid dibutuhkan."}), 400
-
-    # TODO: Integrasikan dengan proses pembayaran tip yang sesungguhnya
-    result = service.give_thanks_to_driver(driver_id, amount)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
-
+    try:
+        # Verifikasi signature/hash webhook akan dilakukan di sini di produksi
+        # service.verify_webhook_signature(request.headers, request.get_data())
+        
+        service.process_payment_webhook(payload)
+        logger.info(f"Webhook untuk pesanan {payload.get('order_id')} berhasil diproses.")
+        # Selalu kembalikan 200 OK jika kita berhasil menerima dan memvalidasi payload,
+        # bahkan jika ada kegagalan logika bisnis, untuk mencegah pengiriman ulang dari gerbang pembayaran.
+        return jsonify({"status": "received"}), 200
+    
+    except ValueError as e:
+        # Ini terjadi jika payload webhook itu sendiri tidak valid.
+        logger.error(f"Webhook tidak valid diterima: {e}")
+        return jsonify({"status": "invalid_payload", "message": str(e)}), 400
+    except Exception as e:
+        # Tangkap semua kesalahan lain untuk memastikan gerbang pembayaran tidak mendapatkan 500
+        logger.critical(f"Kesalahan kritis yang tidak tertangani saat memproses webhook: {e}", exc_info=True)
+        # Kita tetap mengembalikan 200 agar webhook tidak dikirim ulang tanpa henti,
+        # tetapi kita log sebagai CRITICAL agar bisa segera ditindaklanjuti.
+        return jsonify({"status": "received_with_error"}), 200

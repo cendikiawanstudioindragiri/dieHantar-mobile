@@ -1,62 +1,53 @@
 # blueprints/drivers.py
 
 from flask import Blueprint, request, jsonify
-from . import driver_service as service
+from logger_config import get_logger
+from .auth_service import token_required # Kita akan butuh ini untuk mengamankan endpoint
+from . import drivers_service as service
 
-# Definisikan Blueprint untuk driver
-drivers_bp = Blueprint('drivers_bp', __name__)
+drivers_bp = Blueprint('drivers', __name__, url_prefix='/api/v1/drivers')
+logger = get_logger('DriversBlueprint')
 
-# --- Rute untuk Informasi dan Aksi Driver --- #
+@drivers_bp.route('/<string:driver_id>/info', methods=['GET'])
+def get_driver_info_endpoint(driver_id):
+    """Endpoint publik untuk mendapatkan informasi dasar seorang driver."""
+    try:
+        driver = service.get_driver_public_info(driver_id=driver_id)
+        logger.info(f"Berhasil mengambil info untuk driver {driver_id}")
+        return jsonify({"success": True, "driver": driver.to_dict()}), 200
+    except ValueError as e:
+        logger.warning(f"Pengambilan info driver {driver_id} gagal: {e}")
+        return jsonify({"success": False, "message": str(e)}), 404 # Not Found
+    except RuntimeError as e:
+        logger.error(f"Kesalahan server saat mengambil info driver {driver_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@drivers_bp.route('/<driver_id>/info', methods=['GET'])
-def get_driver_info(driver_id: str):
-    """Endpoint untuk mendapatkan informasi publik tentang seorang driver."""
-    # TODO: Amankan endpoint ini
-    if not driver_id:
-        return jsonify({"success": False, "message": "ID Driver dibutuhkan."}), 400
+@drivers_bp.route('/<string:driver_id>/location', methods=['POST'])
+@token_required
+def update_location_endpoint(uid, driver_id):
+    """Endpoint aman untuk driver memperbarui lokasi mereka."""
+    # Verifikasi bahwa driver yang diautentikasi (dari token) adalah orang
+    # yang sama dengan yang datanya ingin diubah.
+    if uid != driver_id:
+        logger.warning(f"Akses ditolak: UID {uid} mencoba memperbarui lokasi driver {driver_id}.")
+        return jsonify({"success": False, "message": "Akses ditolak."}), 403
 
-    result = service.get_driver_public_info(driver_id)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 404 # Not Found jika driver tidak ada
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Request body tidak boleh kosong."}), 400
 
-# --- Rute untuk Chat --- #
+    try:
+        service.update_driver_location(
+            driver_id=driver_id,
+            lat=data.get('latitude'),
+            lon=data.get('longitude')
+        )
+        logger.info(f"Lokasi driver {driver_id} berhasil diperbarui oleh UID {uid}.")
+        return jsonify({"success": True, "message": "Lokasi berhasil diperbarui."}), 200
 
-@drivers_bp.route('/chat', methods=['POST'])
-def send_message():
-    """Endpoint untuk mengirim pesan chat untuk sebuah pesanan."""
-    data = request.json
-    order_id = data.get('order_id')
-    sender_uid = data.get('sender_uid')
-    recipient_uid = data.get('recipient_uid')
-    message_text = data.get('message_text')
-
-    # TODO: Amankan endpoint ini, verifikasi bahwa sender_uid adalah bagian dari pesanan
-    if not all([order_id, sender_uid, recipient_uid, message_text]):
-        return jsonify({"success": False, "message": "Data tidak lengkap untuk mengirim pesan."}), 400
-
-    result = service.send_chat_message(order_id, sender_uid, recipient_uid, message_text)
-    if result["success"]:
-        return jsonify(result), 201
-    return jsonify(result), 500
-
-# --- Rute untuk Pencocokan Driver (untuk simulasi) --- #
-# Dalam skenario dunia nyata, ini kemungkinan akan menjadi panggilan internal yang dilindungi
-# dari layanan pesanan, bukan endpoint publik.
-
-@drivers_bp.route('/match', methods=['POST'])
-def match_driver_to_order():
-    """
-    (Untuk Simulasi) Endpoint untuk memicu pencocokan driver untuk pesanan.
-    """
-    data = request.json
-    order_id = data.get('order_id')
-    pickup_location = data.get('pickup_location') # e.g., {'lat': -6.2, 'lon': 106.8}
-
-    if not order_id or not pickup_location:
-        return jsonify({"success": False, "message": "ID Pesanan dan lokasi penjemputan dibutuhkan."}), 400
-
-    result = service.find_nearest_driver(order_id, pickup_location)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
+    except ValueError as e:
+        logger.warning(f"Pembaruan lokasi oleh UID {uid} untuk driver {driver_id} gagal: {e}")
+        return jsonify({"success": False, "message": str(e)}), 400 # Bad Request
+    except RuntimeError as e:
+        logger.error(f"Kesalahan server saat UID {uid} memperbarui lokasi driver {driver_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500

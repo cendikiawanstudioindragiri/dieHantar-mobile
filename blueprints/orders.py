@@ -1,67 +1,54 @@
 # blueprints/orders.py
 
 from flask import Blueprint, request, jsonify
-from . import order_service as service
+from logger_config import get_logger
+from .auth_service import token_required
+from . import orders_service as service
 
-# Definisikan Blueprint untuk pesanan
-orders_bp = Blueprint('orders_bp', __name__, url_prefix='/api/v1/orders')
-
-# --- Rute untuk Kalkulasi dan Pembuatan Pesanan --- #
-
-@orders_bp.route('/calculate', methods=['POST'])
-def calculate_order():
-    """Endpoint untuk menghitung ringkasan pesanan (subtotal, diskon, total)."""
-    data = request.json
-    items = data.get('items')
-    promotion_code = data.get('promotion_code')
-
-    if not items:
-        return jsonify({"success": False, "message": "'items' tidak boleh kosong."}), 400
-
-    summary = service.calculate_order_summary(items, promotion_code)
-    return jsonify({"success": True, "summary": summary})
+orders_bp = Blueprint('orders', __name__, url_prefix='/api/v1/orders')
+logger = get_logger('OrdersBlueprint')
 
 @orders_bp.route('/', methods=['POST'])
-def create_order():
-    """Endpoint untuk membuat pesanan baru."""
-    data = request.json
-    uid = data.get('uid')
-    order_details = data.get('order_details')
+@token_required
+def create_order_endpoint(uid):
+    """Endpoint untuk pengguna membuat pesanan makanan baru."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Request body tidak boleh kosong."}), 400
 
-    # TODO: Ganti pengambilan UID dari body dengan verifikasi token otentikasi
-    if not uid or not order_details:
-        return jsonify({"success": False, "message": "UID dan detail pesanan dibutuhkan."}), 400
+    try:
+        order = service.create_new_order(
+            user_id=uid,
+            items_data=data.get('items'),
+            address=data.get('delivery_address'),
+            promo_code=data.get('promotion_code')
+        )
+        logger.info(f"Pesanan baru {order.id} berhasil dibuat oleh UID {uid}.")
+        return jsonify({"success": True, "message": "Pesanan berhasil dibuat.", "order": order.to_dict()}), 201
 
-    result = service.create_new_order(uid, order_details)
-    if result["success"]:
-        return jsonify(result), 201  # 201 Created
-    return jsonify(result), 500
+    except ValueError as e:
+        logger.warning(f"Pembuatan pesanan oleh UID {uid} gagal: {e}")
+        return jsonify({"success": False, "message": str(e)}), 400  # Bad Request
+    except RuntimeError as e:
+        logger.error(f"Kesalahan server saat UID {uid} membuat pesanan: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500  # Internal Server Error
 
-# --- Rute untuk Riwayat dan Pembatalan Pesanan --- #
+@orders_bp.route('/<string:order_id>', methods=['GET'])
+@token_required
+def get_order_endpoint(uid, order_id):
+    """Endpoint untuk mendapatkan detail pesanan spesifik."""
+    try:
+        order = service.get_order_for_user(order_id=order_id, user_id=uid)
+        logger.info(f"UID {uid} berhasil mengambil pesanan {order_id}.")
+        return jsonify({"success": True, "order": order.to_dict()}), 200
 
-@orders_bp.route('/history/<string:uid>', methods=['GET'])
-def get_order_history(uid):
-    """Endpoint untuk mendapatkan riwayat pesanan pengguna (active, completed, canceled)."""
-    # TODO: Amankan endpoint ini dengan verifikasi token.
-    order_type = request.args.get('type', 'active') # default ke 'active'
-    
-    result = service.get_user_orders(uid, order_type)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 500
+    except ValueError as e:
+        logger.warning(f"Pengambilan pesanan {order_id} oleh UID {uid} gagal: {e}")
+        return jsonify({"success": False, "message": str(e)}), 404 # Not Found
+    except PermissionError as e:
+        logger.warning(f"Akses ditolak untuk UID {uid} pada pesanan {order_id}: {e}")
+        return jsonify({"success": False, "message": str(e)}), 403 # Forbidden
+    except RuntimeError as e:
+        logger.error(f"Kesalahan server saat UID {uid} mengambil pesanan {order_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500 # Internal Server Error
 
-@orders_bp.route('/<string:order_id>/cancel', methods=['POST'])
-def cancel_single_order(order_id):
-    """Endpoint untuk membatalkan pesanan."""
-    data = request.json
-    uid = data.get('uid')
-    reason = data.get('reason', 'Tidak ada alasan diberikan.')
-
-    # TODO: Ganti pengambilan UID dari body dengan verifikasi token.
-    if not uid:
-        return jsonify({"success": False, "message": "UID dibutuhkan."}), 400
-
-    result = service.cancel_order(order_id, uid, reason)
-    if result["success"]:
-        return jsonify(result), 200
-    return jsonify(result), 400 if "tidak bisa dibatalkan" in result.get("message", "") else 500

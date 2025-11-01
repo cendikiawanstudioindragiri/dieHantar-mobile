@@ -1,65 +1,57 @@
-import firebase_admin
-import json
+# firebase_config.py
+
 import os
+import json
+import logging
+import firebase_admin
 from firebase_admin import credentials, firestore, auth, messaging
 
-def initialize_firebase_admin():
+# Siapkan logger untuk modul ini
+logger = logging.getLogger(__name__)
+
+def initialize_firebase():
     """
-    Menginisialisasi Firebase Admin SDK jika belum ada. 
-    Fungsi ini sekarang aman untuk dipanggil berkali-kali (idempotent).
+    Menginisialisasi Firebase Admin SDK jika belum ada. Idempotent.
+    
+    Mencoba mengambil kredensial dari variabel lingkungan FIREBASE_CREDENTIALS_JSON.
+    Jika tidak ada, akan kembali ke default (berguna untuk Google Cloud Environments seperti App Hosting).
     """
-    # Cek apakah aplikasi default sudah ada sebelum mencoba inisialisasi
     if not firebase_admin._apps:
-        firebase_credentials_json = os.environ.get('FIREBASE_CREDENTIALS_JSON')
         try:
+            firebase_credentials_json = os.environ.get('FIREBASE_CREDENTIALS_JSON')
+            
             if firebase_credentials_json:
-                import json
-                cred = credentials.Certificate(json.loads(firebase_credentials_json))
+                logger.info("Menginisialisasi Firebase dari FIREBASE_CREDENTIALS_JSON...")
+                cred_dict = json.loads(firebase_credentials_json)
+                cred = credentials.Certificate(cred_dict)
                 firebase_admin.initialize_app(cred)
-                print("INFO: Firebase Admin SDK berhasil diinisialisasi dari variabel lingkungan FIREBASE_CREDENTIALS_JSON.")
             else:
-                print("WARNING: Variabel lingkungan FIREBASE_CREDENTIALS_JSON tidak ditemukan. Mencoba inisialisasi default (untuk lingkungan Google Cloud).")
-                try:
-                    firebase_admin.initialize_app()
-                    print("INFO: Berhasil inisialisasi Firebase Admin secara default.")
-                except ValueError:
-                    print("FATAL: Gagal total menginisialisasi Firebase Admin. Kredensial tidak ditemukan.")
-                    # Hentikan aplikasi jika tidak ada kredensial sama sekali
-                    raise
+                logger.info("FIREBASE_CREDENTIALS_JSON tidak disetel. Menggunakan kredensial default aplikasi...")
+                # Ini adalah metode yang disarankan untuk lingkungan Google Cloud (termasuk Firebase App Hosting)
+                firebase_admin.initialize_app()
+            
+            logger.info("Firebase Admin SDK berhasil diinisialisasi.")
+
         except Exception as e:
-                print("FATAL: Gagal total menginisialisasi Firebase Admin. Kredensial tidak ditemukan.")
-                print(f"Error: {e}")
-                # Hentikan aplikasi jika tidak ada kredensial sama sekali
-    # Jika sudah ada, tidak perlu melakukan apa-apa.
+            logger.critical(f"FATAL: Gagal menginisialisasi Firebase Admin SDK: {e}", exc_info=True)
+            # Gagal pada tahap ini bersifat fatal, jadi kita sebarkan pengecualiannya
+            # agar aplikasi gagal启动 daripada berjalan dalam keadaan rusak.
+            raise
 
 def get_firestore_client():
-    """Mengembalikan instance Firestore client. Menginisialisasi app jika perlu."""
-    initialize_firebase_admin() # Memastikan SDK siap digunakan
+    """Mengembalikan instance Firestore client. Memastikan SDK sudah diinisialisasi."""
+    if not firebase_admin._apps:
+        initialize_firebase()
     return firestore.client()
 
 def get_auth_client():
-    """Mengembalikan instance Auth client. Menginisialisasi app jika perlu."""
-    initialize_firebase_admin() # Memastikan SDK siap digunakan
+    """Mengembalikan instance Auth client. Memastikan SDK sudah diinisialisasi."""
+    if not firebase_admin._apps:
+        initialize_firebase()
     return auth
 
-def send_fcm_notification(token, title, body, data=None):
-    """
-    Mengirim notifikasi push ke perangkat menggunakan Firebase Cloud Messaging (FCM).
-    """
-    initialize_firebase_admin() # Memastikan SDK siap digunakan
-    try:
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            data=data,
-            token=token,
-        )
-        
-        response = messaging.send(message)
-        print(f"INFO: Notifikasi berhasil dikirim: {response}")
-        return response
-    except Exception as e:
-        print(f"ERROR: Gagal mengirim notifikasi: {e}")
-        return None
+def get_messaging_client():
+    """Mengembalikan instance Messaging client. Memastikan SDK sudah diinisialisasi."""
+    if not firebase_admin._apps:
+        initialize_firebase()
+    return messaging
