@@ -74,8 +74,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   IconData getIcon(String title) {
     if (title.contains('Order')) return Icons.restaurant_menu;
     if (title.contains('Driver')) return Icons.delivery_dining;
-    if (title.contains('Off') || title.contains('Discount'))
+    if (title.contains('Off') || title.contains('Discount')) {
       return Icons.local_offer;
+    }
     if (title.contains('Delivered')) return Icons.check_circle;
     return Icons.notifications;
   }

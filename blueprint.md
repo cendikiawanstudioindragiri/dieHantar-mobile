@@ -1,49 +1,71 @@
-# dieHantar Super App Blueprint
+# Rangkuman Proyek
 
-## 1. Overview
+## Fitur Profil
 
-**dieHantar** is evolving from a food delivery service into a "super app" designed to be an indispensable part of a user's daily life. The goal is to create an integrated ecosystem of on-demand services, starting with food delivery and expanding into transportation, logistics, and digital payments, all accessible through a single, intuitive mobile application.
+### Ringkasan
 
-This blueprint outlines the current features, the planned expansion, and the technical roadmap for implementation.
+Fitur ini memungkinkan pengguna untuk melihat dan mengelola profil mereka. Ini mencakup beberapa layar untuk berbagai tindakan terkait profil.
 
-## 2. Current Implemented Features (Food Delivery)
+### Layar
 
--   **User Authentication:** Secure signup, login, and logout.
--   **Restaurant Browsing:** A home screen to discover and view restaurants.
--   **Menu & Ordering:** Detailed restaurant screens with menus to add items to a cart.
--   **Shopping Cart:** A fully functional cart to review and manage items.
--   **Checkout Process:** A simulated order placement and checkout flow.
--   **Reviews & Ratings (Static):** UI for submitting and viewing reviews, currently using static data.
--   **Notifications (Static):** A notification screen displaying hardcoded updates.
+*   **ProfileScreen**: Layar profil utama.
+*   **Profile2Screen**: Layar profil alternatif.
+*   **ProfileChangeUserInformationScreen**: Layar untuk mengubah informasi pengguna.
+*   **PhoneNumberAccountScreen**: Layar untuk mengelola akun nomor telepon.
+*   **EmailAccountScreen**: Layar untuk mengelola akun email.
+*   **GoogleAccountScreen**: Layar untuk mengelola akun Google.
+*   **UsernameScreen**: Layar untuk mengubah nama pengguna.
+*   **FullNameScreen**: Layar untuk mengubah nama lengkap.
+*   **AvatarChangeScreen**: Layar untuk mengubah avatar.
+*   **ChangeOfFinancialSourcesScreen**: Layar untuk mengubah sumber keuangan.
+*   **FacebookAccountScreen**: Layar untuk mengelola akun Facebook.
+*   **ProfileLogoutScreen**: Layar untuk keluar.
+*   **ProfileNotLoggedInYetScreen**: Layar yang ditampilkan saat pengguna belum masuk.
 
-## 3. Planned Super App Expansion
+## Fitur Pesan
 
-### Core Services
--   **`dieHantar Food`:** (Existing) The core food delivery service.
--   **`dieHantar Ride`:** A ride-hailing service for ordering motorcycle taxis (Ojek) and cars.
--   **`dieHantar Send`:** An instant courier service for package delivery.
+### Ringkasan
 
-### Core Features
--   **`dieHantar Wallet`:** An integrated e-wallet for seamless, one-tap payments across all services. Users can top up their balance and view transaction history.
--   **Live Driver Tracking:** A real-time map interface to track the driver's location for food orders, rides, and package deliveries.
--   **In-App Chat:** A secure chat feature for direct communication between users and drivers/riders.
--   **Dynamic Notification System:** A backend-driven system to push real-time updates (order status, driver location, promos) to users.
--   **Promo & Voucher System:** A flexible backend to manage promotional campaigns, discounts, and loyalty rewards.
+Fitur ini menangani fungsionalitas pesan dalam aplikasi.
 
-## 4. Current Development Plan
+### Layar
 
-**Objective:** Build the foundational backend services required for dynamic features.
+*   **MessagesScreen**: Layar utama untuk melihat semua pesan.
+*   **MessagePriorityScreen**: Layar untuk melihat pesan prioritas.
+*   **MessagesFavoriteScreen**: Layar untuk melihat pesan favorit.
 
-1.  **Implement Reviews & Ratings API:**
-    *   Create a `POST /reviews` endpoint in `functions/main.py` to allow users to submit a new review for an order.
-    *   Create a `GET /reviews?restaurantId=<id>` endpoint to fetch all reviews for a specific restaurant.
-    *   Connect the Flutter frontend (`rating_screen.dart` and `reviews_list_screen.dart`) to these new APIs.
-    *   Store review data in Firestore.
+## Fitur Undang Teman
 
-2.  **Implement Dynamic Notifications API:**
-    *   Create a `GET /notifications?userId=<id>` endpoint to fetch a user's notifications.
-    *   Modify the `notification_screen.dart` to fetch data from this API instead of using a static list.
-    *   Integrate with Firebase Cloud Messaging (FCM) to push real-time status updates in the future.
+### Ringkasan
 
----
-*This blueprint will be updated as new features are implemented.*
+Fitur ini memungkinkan pengguna untuk mengundang teman-teman mereka ke aplikasi.
+
+### Layar
+
+*   **InviteFriendsScreen**: Layar untuk mengundang teman.
+
+## Fitur Pusat Bantuan
+
+### Ringkasan
+
+Fitur ini menyediakan bantuan dan dukungan kepada pengguna.
+
+### Layar
+
+*   **HelpCenterScreen**: Layar utama pusat bantuan.
+*   **HelpCenterDetailScreen**: Layar untuk melihat detail item bantuan tertentu.
+
+## Fitur Lainnya
+
+### Ringkasan
+
+Bagian ini berisi berbagai layar lain-lain yang tidak termasuk dalam kategori lain.
+
+### Layar
+
+*   **TermOfServiceScreen**: Menampilkan persyaratan layanan aplikasi.
+*   **PrivacyPolicyScreen**: Menampilkan kebijakan privasi aplikasi.
+*   **AboutAppScreen**: Memberikan informasi tentang aplikasi.
+*   **SocialMediaNetworksScreen**: Menampilkan tautan ke jejaring media sosial aplikasi.
+*   **DonationScreen**: Memungkinkan pengguna untuk memberikan donasi.
+*   **FeedbackScreen**: Memungkinkan pengguna untuk memberikan masukan dan saran.
