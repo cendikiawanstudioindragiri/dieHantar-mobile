@@ -14,6 +14,13 @@
     pkgs.unzip
     # Firebase CLI for seamless integration
     pkgs.firebase-tools
+    # Add Python environment with packages
+    (pkgs.python3.withPackages (ps: [
+      ps.fastapi
+      ps.uvicorn
+      ps.python-multipart
+      ps.google-cloud-storage
+    ]))
   ];
 
   # Sets environment variables in the workspace.
@@ -29,6 +36,8 @@
     extensions = [
       "Dart-Code.flutter"
       "Dart-Code.dart-code"
+      # Add Python extension for better editing
+      "ms-python.python"
     ];
 
     # Enable previews for hot reload

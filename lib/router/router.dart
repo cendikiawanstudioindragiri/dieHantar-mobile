@@ -70,12 +70,22 @@ import 'package:learn_flutter_gemini/features/others/screens/about_app_screen.da
 import 'package:learn_flutter_gemini/features/others/screens/social_media_networks_screen.dart';
 import 'package:learn_flutter_gemini/features/others/screens/donation_screen.dart';
 import 'package:learn_flutter_gemini/features/others/screens/feedback_screen.dart';
+import 'package:learn_flutter_gemini/more/profile_screen.dart';
+import 'package:learn_flutter_gemini/cart/cart_screen.dart';
 
 final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
       builder: (context, state) => const PaymentScreen(),
+    ),
+    GoRoute(
+      path: '/cart',
+      builder: (context, state) => const CartScreen(),
+    ),
+    GoRoute(
+      path: '/upload_profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(
       path: '/payment_checked',

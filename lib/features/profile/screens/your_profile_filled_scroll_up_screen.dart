@@ -53,7 +53,7 @@ class YourProfileFilledScrollUpScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField(
-              value: 'Male',
+              initialValue: 'Male',
               items: const [
                 DropdownMenuItem(value: 'Male', child: Text('Male')),
                 DropdownMenuItem(value: 'Female', child: Text('Female')),

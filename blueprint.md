@@ -69,3 +69,18 @@ Bagian ini berisi berbagai layar lain-lain yang tidak termasuk dalam kategori la
 *   **SocialMediaNetworksScreen**: Menampilkan tautan ke jejaring media sosial aplikasi.
 *   **DonationScreen**: Memungkinkan pengguna untuk memberikan donasi.
 *   **FeedbackScreen**: Memungkinkan pengguna untuk memberikan masukan dan saran.
+
+## Fitur Keranjang Belanja
+
+### Ringkasan
+
+Fitur ini menangani semua fungsionalitas terkait keranjang belanja untuk pesanan makanan.
+
+### Komponen
+
+*   **`lib/models/cart_item_model.dart`**: Model data untuk setiap item dalam keranjang.
+*   **`lib/providers/cart_provider.dart`**: State management provider untuk mengelola logika keranjang (tambah, hapus, hitung total).
+*   **`lib/cart/cart_screen.dart`**: Layar UI utama yang menampilkan isi keranjang, total harga, dan tombol checkout.
+*   **`lib/cart/widgets/cart_item_widget.dart`**: Widget UI untuk merepresentasikan satu item di dalam daftar keranjang.
+*   **`lib/main.dart`**: Diperbarui dengan `MultiProvider` untuk menyertakan `CartProvider`.
+*   **`lib/router/router.dart`**: Diperbarui dengan rute `/cart` untuk mengakses layar keranjang.

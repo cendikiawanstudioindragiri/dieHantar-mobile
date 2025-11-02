@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/models/cart_item_model.dart';
+import '../models/cart_item_model.dart';
 
 class CartProvider with ChangeNotifier {
   final Map<String, CartItem> _items = {};
 
   Map<String, CartItem> get items => {..._items};
 
-  int get itemCount {
-    return _items.length;
-  }
+  int get itemCount => _items.length;
 
   double get totalAmount {
     var total = 0.0;
@@ -18,38 +16,51 @@ class CartProvider with ChangeNotifier {
     return total;
   }
 
-  void addItem(String name, int price) {
-    if (_items.containsKey(name)) {
+  void addItem(String productId, String name, double price, String imageUrl) {
+    if (_items.containsKey(productId)) {
+      // Jika item sudah ada, cukup tingkatkan jumlahnya
       _items.update(
-        name,
-        (existingCartItem) => CartItem(
-          name: existingCartItem.name,
-          price: existingCartItem.price,
+        productId,
+        (existingCartItem) => existingCartItem.copyWith(
           quantity: existingCartItem.quantity + 1,
         ),
       );
     } else {
-      _items.putIfAbsent(name, () => CartItem(name: name, price: price));
+      // Jika item baru, tambahkan ke keranjang
+      _items.putIfAbsent(
+        productId,
+        () => CartItem(
+          id: DateTime.now().toString(),
+          name: name,
+          price: price,
+          quantity: 1,
+          imageUrl: imageUrl,
+        ),
+      );
     }
     notifyListeners();
   }
 
-  void removeSingleItem(String name) {
-    if (!_items.containsKey(name)) {
-      return;
-    }
-    if (_items[name]!.quantity > 1) {
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) return;
+
+    if (_items[productId]!.quantity > 1) {
+      // Jika jumlah lebih dari 1, kurangi jumlahnya
       _items.update(
-        name,
-        (existingCartItem) => CartItem(
-          name: existingCartItem.name,
-          price: existingCartItem.price,
+        productId,
+        (existingCartItem) => existingCartItem.copyWith(
           quantity: existingCartItem.quantity - 1,
         ),
       );
     } else {
-      _items.remove(name);
+      // Jika jumlah hanya 1, hapus item dari keranjang
+      _items.remove(productId);
     }
+    notifyListeners();
+  }
+
+  void removeItem(String productId) {
+    _items.remove(productId);
     notifyListeners();
   }
 
