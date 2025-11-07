@@ -1,0 +1,5 @@
+export const COLORS = {
+  PRIMARY: '#0066FF',
+  SECONDARY: '#00CC99',
+  BACKGROUND: '#FFFFFF',
+};

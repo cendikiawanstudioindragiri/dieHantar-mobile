@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  auth:
+    build: ./services/auth
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://postgres:example@postgres:5432/diehantar
+  order:
+    build: ./services/order
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: diehantar
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

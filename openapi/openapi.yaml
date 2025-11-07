@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: dieHantar API (skeleton)
+  version: 0.1.0
+paths:
+  /auth/login:
+    post:
+      summary: Login user (stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+  /orders:
+    post:
+      summary: Create order (stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: created

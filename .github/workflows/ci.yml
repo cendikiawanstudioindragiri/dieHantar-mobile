@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build docker images
+        run: |
+          docker build -t diehantar-auth:ci ./services/auth
+          docker build -t diehantar-order:ci ./services/order
+
+      - name: Start services with docker-compose and run smoke tests
+        run: |
+          docker-compose up -d --build
+          # Wait for services to come up
+          for i in {1..15}; do
+            if curl -sSf http://localhost:3001/health >/dev/null && curl -sSf http://localhost:3002/health >/dev/null; then
+              echo "services healthy"; break
+            fi
+            sleep 2
+          done
+          curl -f http://localhost:3001/health
+          curl -f http://localhost:3002/health
+        env:
+          COMPOSE_HTTP_TIMEOUT: '200'
+
+      - name: Push images to registry (optional)
+        if: secrets.GITHUB_REGISTRY_USERNAME && secrets.GITHUB_REGISTRY_TOKEN
+        run: |
+          echo "Logging in to registry"
+          echo ${{ secrets.GITHUB_REGISTRY_TOKEN }} | docker login ghcr.io -u ${{ secrets.GITHUB_REGISTRY_USERNAME }} --password-stdin
+          docker tag diehantar-auth:ci ghcr.io/${{ github.repository }}/diehantar-auth:latest
+          docker tag diehantar-order:ci ghcr.io/${{ github.repository }}/diehantar-order:latest
+          docker push ghcr.io/${{ github.repository }}/diehantar-auth:latest
+          docker push ghcr.io/${{ github.repository }}/diehantar-order:latest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: 'enabled'
