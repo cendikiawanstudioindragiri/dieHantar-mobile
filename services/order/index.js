@@ -19,6 +19,15 @@ async function initDb() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
       )
     `);
+    // events table for simple event bus / audit trail
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS events (
+        id SERIAL PRIMARY KEY,
+        event_type TEXT NOT NULL,
+        payload JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      )
+    `);
     console.log('Order service connected to Postgres and ensured orders table exists');
     return client;
   } catch (err) {
@@ -47,7 +56,14 @@ async function handleRequest(req, res) {
         if (dbClient) {
           try {
             const result = await dbClient.query('INSERT INTO orders(user_id, items) VALUES($1,$2) RETURNING id, status', [userId, items]);
-            return sendJSON(res, 201, { orderId: result.rows[0].id, status: result.rows[0].status });
+            const orderId = result.rows[0].id;
+            // write event to events table (simple event bus)
+            try {
+              await dbClient.query('INSERT INTO events(event_type, payload) VALUES($1,$2)', ['order.created', { orderId, userId, items }]);
+            } catch (evtErr) {
+              console.warn('Failed to write event:', evtErr.message || evtErr);
+            }
+            return sendJSON(res, 201, { orderId, status: result.rows[0].status });
           } catch (dbErr) {
             return sendJSON(res, 500, { error: dbErr.message });
           }
