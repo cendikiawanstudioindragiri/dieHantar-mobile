@@ -72,3 +72,9 @@ def update_driver_location(driver_id: str, lat: float, lon: float) -> None:
     except Exception as e:
         logger.error(f"Gagal memperbarui lokasi driver {driver_id}: {e}", exc_info=True)
         raise RuntimeError("Gagal memperbarui lokasi driver di database.") from e
+
+def find_and_assign_nearest_driver(order_id: str) -> Optional[str]:
+    """Find and assign nearest available driver to an order (stub)."""
+    # Stub implementation - returns None for now
+    logger.info(f"Mencari driver untuk pesanan {order_id} (placeholder)")
+    return None

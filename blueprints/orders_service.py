@@ -103,3 +103,38 @@ def get_order_for_user(order_id: str, user_id: str) -> Order:
     except Exception as e:
         logger.error(f"Gagal mengambil pesanan {order_id}: {e}", exc_info=True)
         raise RuntimeError("Gagal mengambil data pesanan dari database.") from e
+
+def get_order_by_id(order_id: str) -> Order:
+    """Get order by ID without user validation (for internal use)."""
+    try:
+        order_ref = db.collection(ORDERS_COLLECTION).document(order_id)
+        doc = order_ref.get()
+        if not doc.exists:
+            raise ValueError(f"Pesanan dengan ID {order_id} tidak ditemukan.")
+        return Order.from_dict(doc.id, doc.to_dict())
+    except ValueError:
+        raise
+    except Exception as e:
+        logger.error(f"Gagal mengambil pesanan {order_id}: {e}", exc_info=True)
+        raise RuntimeError("Gagal mengambil data pesanan dari database.") from e
+
+def update_order_status(order_id: str, new_status: str) -> Order:
+    """Update order status."""
+    try:
+        order_ref = db.collection(ORDERS_COLLECTION).document(order_id)
+        doc = order_ref.get()
+        if not doc.exists:
+            raise ValueError(f"Pesanan dengan ID {order_id} tidak ditemukan.")
+        
+        order_ref.update({
+            'status': new_status,
+            'updated_at': datetime.datetime.now()
+        })
+        
+        updated_doc = order_ref.get()
+        return Order.from_dict(updated_doc.id, updated_doc.to_dict())
+    except ValueError:
+        raise
+    except Exception as e:
+        logger.error(f"Gagal mengupdate status pesanan {order_id}: {e}", exc_info=True)
+        raise RuntimeError("Gagal mengupdate status pesanan.") from e

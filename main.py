@@ -20,6 +20,10 @@ def create_app():
     from blueprints.orders import orders_bp
     from blueprints.payments import payments_bp
     from blueprints.data_catalog import data_catalog_bp
+    from blueprints.broadcasts import broadcasts_bp
+    from blueprints.configs import configs_bp
+    from blueprints.wallet import wallet_bp
+    from blueprints.partners import partners_bp
 
     # Daftarkan semua blueprint dengan prefix API v1 yang konsisten
     # Catatan: Beberapa blueprint sudah memiliki prefix internal, jadi kita hanya mendaftarkannya.
@@ -30,6 +34,10 @@ def create_app():
     app.register_blueprint(orders_bp) # prefix /api/v1/orders ada di dalam blueprint
     app.register_blueprint(payments_bp) # prefix /api/v1/payments ada di dalam blueprint
     app.register_blueprint(data_catalog_bp) # prefix /api/v1/catalog ada di dalam blueprint
+    app.register_blueprint(broadcasts_bp) # prefix /api/v1/broadcasts ada di dalam blueprint
+    app.register_blueprint(configs_bp) # prefix /api/v1/configs ada di dalam blueprint
+    app.register_blueprint(wallet_bp) # prefix /api/v1/wallet ada di dalam blueprint
+    app.register_blueprint(partners_bp) # prefix /api/v1/partners ada di dalam blueprint
 
     @app.route("/")
     def health_check():
