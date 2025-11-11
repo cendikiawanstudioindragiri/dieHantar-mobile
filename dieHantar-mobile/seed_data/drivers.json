@@ -1,0 +1,24 @@
+[
+    {
+        "id": "driver001",
+        "name": "Budi Santoso",
+        "plate_number": "D 1234 ABC",
+        "phone": "+6281234567890",
+        "is_available": true,
+        "current_location": {
+            "latitude": -6.9175,
+            "longitude": 107.6191
+        }
+    },
+    {
+        "id": "driver002",
+        "name": "Citra Lestari",
+        "plate_number": "B 5678 XYZ",
+        "phone": "+6287654321098",
+        "is_available": true,
+        "current_location": {
+            "latitude": -6.9023,
+            "longitude": 107.6182
+        }
+    }
+]

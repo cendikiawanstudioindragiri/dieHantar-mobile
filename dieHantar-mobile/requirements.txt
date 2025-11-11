@@ -1,0 +1,35 @@
+
+Flask
+python-dotenv
+firebase-admin
+pytest
+
+# Payment Gateway
+midtrans-python
+requests
+
+# Media & File handling
+Pillow
+python-magic
+werkzeug
+
+# Geolocation & Maps
+googlemaps
+geopy
+
+# Rate limiting & Security
+Flask-Limiter
+marshmallow
+flask-wtf
+
+# Async tasks (untuk real-time features)
+celery
+redis
+
+# Analytics & Monitoring
+prometheus-client
+flask-cors
+
+# Additional utilities
+uuid
+datetime

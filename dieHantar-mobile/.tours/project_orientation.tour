@@ -1,0 +1,100 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Panduan Orientasi Proyek dieHantar",
+  "description": "Panduan langkah demi langkah untuk memahami struktur proyek, membuka di IDE, menjalankan, dan melihat informasi proyek.",
+  "isPrimary": true,
+  "steps": [
+    {
+      "title": "Selamat Datang di Proyek dieHantar",
+      "description": "## Selamat Datang! 👋\n\nIni adalah **dieHantar**, aplikasi super-app berbasis Flask untuk layanan pesan-antar makanan dan transportasi.\n\nPanduan ini akan membantu Anda:\n1. **Melihat struktur proyek**\n2. **Membuka proyek di editor/IDE**\n3. **Menjalankan proyek di browser**\n4. **Melihat info proyek (Git/GitHub/GCP)**\n\nKlik **Next** untuk melanjutkan."
+    },
+    {
+      "title": "1. Struktur Proyek - README.md",
+      "description": "## 📁 Struktur Proyek\n\nFile **README.md** berisi dokumentasi utama proyek termasuk struktur folder lengkap.\n\nBeberapa folder penting:\n- **blueprints/** - Modul aplikasi (auth, rides, orders, dll)\n- **seed_data/** - Data awal untuk database\n- **tests/** - Unit tests\n- **main.py** - Entry point aplikasi\n- **requirements.txt** - Daftar dependensi Python",
+      "file": "README.md",
+      "line": 5
+    },
+    {
+      "title": "1. Struktur Proyek - Folder Blueprints",
+      "description": "## 📦 Blueprint Pattern\n\nProyek ini menggunakan **Flask Blueprints** untuk modularitas.\n\nSetiap blueprint menangani fitur spesifik:\n- **auth.py** - Autentikasi pengguna\n- **rides.py** - Layanan transportasi\n- **orders.py** - Pesanan makanan\n- **drivers.py** - Manajemen driver\n- **chats.py** - Fitur chat\n- **payments.py** - Sistem pembayaran\n- **data_catalog.py** - Katalog data\n\nSetiap blueprint memiliki service file untuk logika bisnis.",
+      "directory": "blueprints"
+    },
+    {
+      "title": "1. Struktur Proyek - Main Entry Point",
+      "description": "## 🚀 Application Factory Pattern\n\nFile **main.py** menggunakan pola **Application Factory** untuk membuat instance Flask.\n\nFungsi **create_app()** bertanggung jawab untuk:\n- Inisialisasi Firebase\n- Mendaftarkan semua blueprints\n- Mengonfigurasi routing\n- Menyediakan health check endpoint",
+      "file": "main.py",
+      "line": 8
+    },
+    {
+      "title": "1. Struktur Proyek - Konfigurasi Dependencies",
+      "description": "## 📋 Dependencies\n\nFile **requirements.txt** berisi semua package Python yang dibutuhkan:\n\n- **Flask** - Web framework\n- **python-dotenv** - Manajemen environment variables\n- **firebase-admin** - Firebase SDK\n- **pytest** - Testing framework\n\nUntuk melihat daftar lengkap file dalam proyek, gunakan perintah:\n```bash\nls -la\n```\n\nUntuk melihat struktur folder secara rekursif:\n```bash\ntree\n```\natau\n```bash\nfind . -type f -name \"*.py\" | grep -v __pycache__ | sort\n```",
+      "file": "requirements.txt"
+    },
+    {
+      "title": "2. Membuka Proyek di IDE - Konfigurasi IDX",
+      "description": "## 💻 Membuka di IDE\n\n### Project IDX (Google Cloud)\nProyek ini dikonfigurasi untuk **Project IDX** dengan file `.idx/dev.nix`.\n\nKonfigurasi ini:\n- Mengatur Python 3 environment\n- Membuat virtual environment di `.venv/`\n- Menginstall dependencies otomatis\n- Menyediakan extension VS Code:\n  - **ms-python.python** - Python support\n  - **rangav.vscode-thunder-client** - API testing\n\n### File yang dibuka otomatis:\n- README.md\n- main.py\n- src/index.html (jika ada)",
+      "file": ".idx/dev.nix",
+      "line": 8
+    },
+    {
+      "title": "2. Membuka Proyek di IDE - VS Code Lokal",
+      "description": "## 🖥️ Membuka di VS Code Lokal\n\nJika menggunakan VS Code lokal:\n\n1. **Clone repository:**\n```bash\ngit clone https://github.com/cendikiawanstudios/dieHantar-mobile.git\ncd dieHantar-mobile\n```\n\n2. **Buka di VS Code:**\n```bash\ncode .\n```\n\n3. **Install Extension yang Direkomendasikan:**\n   - Python (Microsoft)\n   - Thunder Client (untuk testing API)\n   - CodeTour (untuk melihat tour ini!)\n\n4. **Setup Virtual Environment:**\n```bash\npython3 -m venv .venv\nsource .venv/bin/activate  # Linux/Mac\n# atau\n.venv\\Scripts\\activate  # Windows\n```",
+      "file": "README.md",
+      "line": 1
+    },
+    {
+      "title": "3. Menjalankan Proyek - Install Dependencies",
+      "description": "## 📦 Install Dependencies\n\nSebelum menjalankan proyek, install semua dependencies:\n\n```bash\n# Pastikan virtual environment aktif\nsource .venv/bin/activate\n\n# Install dependencies\npip install -r requirements.txt\n```\n\nProses ini akan menginstall:\n- Flask dan dependencies-nya\n- Firebase Admin SDK\n- Python-dotenv untuk environment variables\n- Pytest untuk testing",
+      "file": "requirements.txt"
+    },
+    {
+      "title": "3. Menjalankan Proyek - Konfigurasi Firebase",
+      "description": "## 🔥 Konfigurasi Firebase\n\n**PENTING:** Proyek ini memerlukan Firebase credentials.\n\n1. **Buat file `.env`** di root folder:\n```bash\ntouch .env\n```\n\n2. **Tambahkan kredensial Firebase:**\n```env\nFIREBASE_CREDENTIALS_JSON='{\"type\": \"service_account\", ...}'\n```\n\n3. **Atau gunakan path ke file JSON:**\n```env\nGOOGLE_APPLICATION_CREDENTIALS=/path/to/serviceAccountKey.json\n```\n\n**Catatan:** File `.env` sudah ada di `.gitignore` untuk keamanan.\n\nFile **firebase_config.py** menangani inisialisasi Firebase Admin SDK.",
+      "file": "firebase_config.py",
+      "line": 1
+    },
+    {
+      "title": "3. Menjalankan Proyek - Development Server",
+      "description": "## 🏃 Menjalankan Development Server\n\nAda dua cara menjalankan server:\n\n### Cara 1: Menggunakan dev_server.py\n```bash\npython dev_server.py\n```\n\n### Cara 2: Menggunakan devserver.sh (di Project IDX)\n```bash\n./devserver.sh\n```\n\n### Cara 3: Menggunakan Flask CLI\n```bash\nflask run\n```\n\nServer akan berjalan di:\n- **http://localhost:8080** (default)\n- atau port yang ditentukan di environment variable `PORT`\n\nMode **debug=True** aktif untuk development, memberikan:\n- Auto-reload saat file berubah\n- Detail error messages\n- Interactive debugger",
+      "file": "dev_server.py",
+      "line": 16
+    },
+    {
+      "title": "3. Menjalankan Proyek - Health Check Endpoint",
+      "description": "## ✅ Testing di Browser\n\nSetelah server berjalan, buka browser dan akses:\n\n**Health Check Endpoint:**\n```\nhttp://localhost:8080/\n```\n\nResponse yang diharapkan:\n```json\n{\n  \"status\": \"ok\",\n  \"service\": \"dieHantar Super-App API\"\n}\n```\n\n**API Endpoints Lainnya:**\n- `/api/v1/auth/*` - Autentikasi\n- `/api/v1/rides/*` - Layanan transportasi\n- `/api/v1/orders/*` - Pesanan makanan\n- `/api/v1/drivers/*` - Driver management\n- `/api/v1/chats/*` - Chat system\n- `/api/v1/payments/*` - Payment processing\n- `/api/v1/catalog/*` - Data catalog",
+      "file": "main.py",
+      "line": 34
+    },
+    {
+      "title": "3. Menjalankan Proyek - Testing API dengan Thunder Client",
+      "description": "## 🧪 Testing API\n\nGunakan **Thunder Client** extension untuk testing:\n\n1. Buka Thunder Client di VS Code\n2. Buat request baru (New Request)\n3. Set method dan URL:\n   - GET http://localhost:8080/\n   - GET http://localhost:8080/api/v1/catalog/foods\n   - POST http://localhost:8080/api/v1/orders\n\nAtau gunakan **curl** di terminal:\n```bash\ncurl http://localhost:8080/\n```\n\nUntuk testing otomatis, gunakan **pytest**:\n```bash\npytest\n```",
+      "file": "main.py",
+      "line": 22
+    },
+    {
+      "title": "4. Info Proyek - Git Repository",
+      "description": "## 🔍 Informasi Git Repository\n\nUntuk melihat informasi Git:\n\n**Remote repository:**\n```bash\ngit remote -v\n```\n\n**Branch saat ini:**\n```bash\ngit branch\n```\n\n**Status file:**\n```bash\ngit status\n```\n\n**History commits:**\n```bash\ngit log --oneline -10\n```\n\n**Repository URL:**\nhttps://github.com/cendikiawanstudios/dieHantar-mobile",
+      "file": ".gitignore"
+    },
+    {
+      "title": "4. Info Proyek - GitHub Repository",
+      "description": "## 🐙 GitHub Repository\n\n**Organization:** cendikiawanstudios\n**Repository:** dieHantar-mobile\n**URL:** https://github.com/cendikiawanstudios/dieHantar-mobile\n\n### Untuk melihat info GitHub:\n\n**Clone repository:**\n```bash\ngit clone https://github.com/cendikiawanstudios/dieHantar-mobile.git\n```\n\n**Menggunakan GitHub CLI (gh):**\n```bash\ngh repo view cendikiawanstudios/dieHantar-mobile\ngh repo view --web  # Buka di browser\n```\n\n### File .github/workflows\nBerisi GitHub Actions untuk CI/CD automation.",
+      "directory": ".github"
+    },
+    {
+      "title": "4. Info Proyek - Google Cloud Platform (GCP)",
+      "description": "## ☁️ Google Cloud Platform (GCP)\n\nProyek ini terintegrasi dengan **Firebase** (bagian dari GCP).\n\n### Informasi Firebase:\n- **Firebase Admin SDK** digunakan untuk:\n  - Firestore Database\n  - Firebase Storage\n  - Firebase Authentication\n\n### Untuk melihat project GCP:\n\n1. **Firebase Console:**\n   https://console.firebase.google.com\n\n2. **GCP Console:**\n   https://console.cloud.google.com\n\n3. **Menggunakan gcloud CLI:**\n```bash\ngcloud config list\ngcloud projects list\n```\n\n**File konfigurasi:**\n- `firebase_config.py` - Inisialisasi Firebase\n- `.env` - Credentials (tidak di-commit)\n\n**Environment variables yang dibutuhkan:**\n- `FIREBASE_CREDENTIALS_JSON`\n- `GOOGLE_APPLICATION_CREDENTIALS`",
+      "file": "firebase_config.py"
+    },
+    {
+      "title": "4. Info Proyek - Project IDX Configuration",
+      "description": "## 🛠️ Project IDX (Google)\n\n**Project IDX** adalah cloud-based IDE dari Google.\n\nKonfigurasi di file `.idx/dev.nix`:\n\n**Channel:** stable-24.05\n\n**Packages:**\n- Python 3\n- JDK (Java Development Kit)\n\n**VS Code Extensions:**\n- ms-python.python\n- rangav.vscode-thunder-client\n\n**Lifecycle hooks:**\n- **onCreate**: Setup virtual env & install dependencies\n- **onStart**: Jalankan `./devserver.sh`\n\n**Web Preview:**\nOtomatis tersedia di Project IDX untuk melihat aplikasi yang berjalan.",
+      "file": ".idx/dev.nix"
+    },
+    {
+      "title": "Selesai - Langkah Selanjutnya",
+      "description": "## 🎉 Selamat!\n\nAnda telah menyelesaikan tour orientasi proyek dieHantar.\n\n### Apa yang telah dipelajari:\n✅ Struktur proyek dan folder\n✅ Cara membuka proyek di IDE (VS Code / Project IDX)\n✅ Cara menjalankan proyek di browser\n✅ Informasi Git, GitHub, dan GCP\n\n### Langkah Selanjutnya:\n\n1. **Eksplorasi Blueprints:**\n   - Buka folder `blueprints/`\n   - Pelajari setiap modul (auth, rides, orders, dll)\n\n2. **Testing:**\n   ```bash\n   pytest\n   ```\n\n3. **Seed Data:**\n   ```bash\n   python seed_data.py\n   ```\n\n4. **Baca Dokumentasi:**\n   - README.md\n   - GEMINI.md (panduan AI untuk development)\n\n5. **Lihat Tour Lainnya:**\n   - Locust Load Testing Tour\n\n**Happy Coding! 🚀**",
+      "file": "README.md"
+    }
+  ]
+}

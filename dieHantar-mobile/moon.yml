@@ -1,0 +1,14 @@
+tasks:
+  hello:
+    command: echo "Hello, World!"
+
+  # --- LOCALSTACK MANAGEMENT ---
+  localstack:up:
+    command: docker-compose -f docker-compose.yml up -d
+    options:
+      runInCI: false
+
+  localstack:down:
+    command: docker-compose -f docker-compose.yml down
+    options:
+      runInCI: false
