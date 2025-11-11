@@ -1,0 +1,9 @@
+{% macro render_input(field, type="text") %}
+<div class="form-group">
+  <label for="{{ field.id }}">{{ field.label.text }}</label>
+  <input type="{{ type }}" id="{{ field.id }}" name="{{ field.name }}" value="{{ field.data or '' }}" class="form-control">
+  {% if field.errors %}
+    <small class="text-danger">{{ field.errors|join(', ') }}</small>
+  {% endif %}
+</div>
+{% endmacro %}

@@ -1,0 +1,32 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% set category_map = {
+      'success': {'class': 'alert-success', 'title': 'Success'},
+      'info': {'class': 'alert-info', 'title': 'Info'},
+      'warning': {'class': 'alert-warning', 'title': 'Warning'},
+      'error': {'class': 'alert-danger', 'title': 'Error'},
+      'danger': {'class': 'alert-danger', 'title': 'Error'}
+    } %}
+    <div class="flash-container" aria-live="polite" aria-atomic="true">
+      {% for category, message in messages %}
+        {% set meta = category_map.get(category, {'class': 'alert-info', 'title': category|capitalize}) %}
+        <div class="alert {{ meta.class }}" role="alert">
+          <div class="alert-header">
+            <strong class="alert-title">{{ meta.title }}</strong>
+            <button type="button" class="alert-close" aria-label="Close" onclick="this.closest('.alert').remove()">&times;</button>
+          </div>
+          <div class="alert-body">
+            {% if message is mapping %}
+              {% if message.get('title') %}
+                <div class="alert-body-title">{{ message.get('title') }}</div>
+              {% endif %}
+              <div class="alert-body-text">{{ message.get('body', '') }}</div>
+            {% else %}
+              <div class="alert-body-text">{{ message }}</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

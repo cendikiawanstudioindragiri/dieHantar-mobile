@@ -1,0 +1,198 @@
+{
+  "folders": [
+    {
+      "name": "dieHantar-mobile (Root)",
+      "path": "."
+    },
+    {
+      "name": "Backend API",
+      "path": "./backend"
+    },
+    {
+      "name": "Flask App",
+      "path": "./flask_app"
+    },
+    {
+      "name": "Frontend Web",
+      "path": "./frontend"
+    },
+    {
+      "name": "Flutter Mobile",
+      "path": "./flutter_app"
+    },
+    {
+      "name": "Documentation",
+      "path": "./docs"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "./backend/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+      "backend/app/tests"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/node_modules": true,
+      "**/.venv": false
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/*.code-search": true,
+      "**/.venv": true,
+      "**/__pycache__": true
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    "git.autofetch": true,
+    "git.enableSmartCommit": true
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.black-formatter",
+      "ms-python.flake8",
+      "ms-python.pylint",
+      "ms-vscode.vscode-json",
+      "redhat.vscode-yaml",
+      "ms-vscode.vscode-typescript-next",
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "dart-code.dart-code",
+      "dart-code.flutter",
+      "ms-vscode.vscode-docker",
+      "github.copilot",
+      "github.copilot-chat",
+      "ms-vscode.vscode-thunder-client"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Backend API",
+        "type": "shell",
+        "command": "cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Start Flask App",
+        "type": "shell",
+        "command": "cd flask_app && python -m flask --app flask_app run --debug --host 0.0.0.0 --port 5000",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Run Backend Tests",
+        "type": "shell",
+        "command": "cd backend && python -m pytest app/tests -v",
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Install Backend Dependencies",
+        "type": "shell",
+        "command": "cd backend && pip install -r requirements.txt",
+        "group": "build"
+      },
+      {
+        "label": "Install Flask Dependencies",
+        "type": "shell",
+        "command": "cd flask_app && pip install -r requirements.txt",
+        "group": "build"
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Backend API",
+        "type": "python",
+        "request": "launch",
+        "program": "-m",
+        "args": [
+          "uvicorn",
+          "app.main:app",
+          "--reload",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000"
+        ],
+        "cwd": "${workspaceFolder}/backend",
+        "console": "integratedTerminal",
+        "justMyCode": false
+      },
+      {
+        "name": "Debug Flask App",
+        "type": "python",
+        "request": "launch",
+        "program": "-m",
+        "args": [
+          "flask",
+          "--app",
+          "flask_app",
+          "run",
+          "--debug",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "5000"
+        ],
+        "cwd": "${workspaceFolder}/flask_app",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Run Backend Tests (Debug)",
+        "type": "python",
+        "request": "launch",
+        "program": "-m",
+        "args": [
+          "pytest",
+          "app/tests",
+          "-v",
+          "-s"
+        ],
+        "cwd": "${workspaceFolder}/backend",
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+}

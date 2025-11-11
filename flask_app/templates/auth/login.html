@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% from 'components/forms.html' import render_input %}
+{% block title %}Login{% endblock %}
+{% block content %}
+  <h1>Login</h1>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    {{ render_input(form.email, 'email') }}
+    {{ render_input(form.password, 'password') }}
+    <button type="submit" class="btn">Login</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Panduan Kontribusi
+    url: https://github.com/cendikiawanstudios
+    about: Baca konvensi kontribusi sebelum membuat issue
+  - name: Help & Support
+    url: https://github.com/cendikiawanstudios
+    about: Ajukan pertanyaan umum atau permintaan bantuan

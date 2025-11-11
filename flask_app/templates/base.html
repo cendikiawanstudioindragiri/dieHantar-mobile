@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Aplikasi{% endblock %}</title>
+    {# Use bundled/minified CSS in production; fallback to raw in dev if assets not configured #}
+    {% if 'assets' in globals() %}
+      {{ assets['main_css'] }}
+    {% else %}
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    {% endif %}
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    {% include 'components/navbar.html' %}
+    <main class="container">
+      {% include 'components/flash_messages.html' %}
+      {% block content %}{% endblock %}
+    </main>
+    {% include 'components/footer.html' %}
+    {% if 'assets' in globals() %}
+      {{ assets['main_js'] }}
+    {% else %}
+      <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% endif %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

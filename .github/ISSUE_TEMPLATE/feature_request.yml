@@ -1,0 +1,54 @@
+name: Feature request
+description: Usulan fitur atau peningkatan
+title: "[Feature]: "
+labels: ["feature", "product"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bantu kami memahami nilai fitur dengan konteks berikut.
+  - type: input
+    id: summary
+    attributes:
+      label: Ringkasan fitur
+      placeholder: Quick Order untuk pesanan terakhir
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah yang ingin diselesaikan
+      placeholder: Pengguna butuh pemesanan cepat tanpa isi ulang detail
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Ruang lingkup dan batasan
+      placeholder: Hanya untuk ride; tidak mencakup promo
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Kriteria penerimaan
+      placeholder: |
+        - 3 tap dari beranda hingga konfirmasi
+        - Tersedia di Android & iOS
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Perkiraan dampak
+      options:
+        - High
+        - Medium
+        - Low
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Perkiraan effort
+      options:
+        - High
+        - Medium
+        - Low

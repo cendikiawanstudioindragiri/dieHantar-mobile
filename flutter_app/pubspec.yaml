@@ -1,0 +1,31 @@
+name: diehantar_flutter
+description: Flutter client for dieHantar platform
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+# Basic dependencies
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  provider: ^6.0.5
+
+  # Optional json helpers (add when needed)
+  # json_annotation: ^4.9.0
+
+# Dev dependencies
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # build_runner: ^2.4.6
+  # json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/

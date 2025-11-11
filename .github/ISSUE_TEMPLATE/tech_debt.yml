@@ -1,0 +1,40 @@
+name: Tech debt
+description: Pekerjaan perawatan, refactor, atau optimasi teknis
+title: "[TechDebt]: "
+labels: ["tech-debt", "engineering"]
+assignees: []
+body:
+  - type: input
+    id: area
+    attributes:
+      label: Area kode/komponen
+      placeholder: Modul tracking lokasi
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah teknis saat ini
+      placeholder: N+1 query pada endpoint /orders/{id}
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Usulan perbaikan
+      placeholder: Gunakan eager loading dan tambahkan indeks komposit
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risiko jika tidak dikerjakan
+      options:
+        - High
+        - Medium
+        - Low
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Kriteria penerimaan
+      placeholder: Latensi p95 turun 20%, query berkurang 50%

@@ -1,0 +1,69 @@
+name: Bug report
+description: Laporkan bug yang Anda temui
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih telah melaporkan bug. Lengkapi detail berikut.
+  - type: input
+    id: summary
+    attributes:
+      label: Ringkasan singkat
+      description: Jelaskan bug secara singkat
+      placeholder: Crash saat membuka halaman tracking
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah reproduksi
+      description: Uraikan langkah yang memicu bug
+      placeholder: |
+        1. Buka tab Transport
+        2. Pilih tujuan
+        3. Tekan Order
+        4. Aplikasi crash
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Hasil yang diharapkan
+      placeholder: Halaman tracking terbuka tanpa crash
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Hasil aktual
+      placeholder: Aplikasi menutup tiba-tiba
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versi aplikasi
+      placeholder: Android 1.2.3 (123), iOS 1.2.3 (456)
+  - type: input
+    id: device
+    attributes:
+      label: Perangkat/OS
+      placeholder: Pixel 6 (Android 14), iPhone 13 (iOS 18)
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Tingkat keparahan
+      options:
+        - S1 - Crash/Data loss
+        - S2 - Fungsi utama terhambat
+        - S3 - Minor
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log/rekaman layar (opsional)
+      description: Lampirkan potongan log atau tautan rekaman

@@ -1,0 +1,28 @@
+name: Epic
+description: Epic lintas beberapa issue dan sprint
+title: "[Epic]: "
+labels: ["epic", "planning"]
+assignees: []
+body:
+  - type: input
+    id: goal
+    attributes:
+      label: Tujuan epic
+      placeholder: Real-time & Observability
+    validations:
+      required: true
+  - type: textarea
+    id: outcomes
+    attributes:
+      label: Hasil yang diharapkan
+      placeholder: P95 latensi update < 1.5s, tracing E2E aktif
+  - type: textarea
+    id: breakdown
+    attributes:
+      label: Breakdown high-level
+      placeholder: WebSocket channel, fallback polling, tracing, alerting
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependensi
+      placeholder: Gateway API, auth token, infra message broker
